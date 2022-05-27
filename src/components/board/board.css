@@ -1,0 +1,8 @@
+.board {
+    border: 5px solid red;
+    width: 450px;
+    height: 450px;
+    box-sizing: content-box;
+    margin: auto;
+    margin-top: 20px;
+}
