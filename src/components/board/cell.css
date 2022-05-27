@@ -168,3 +168,8 @@
     bottom: 0;
     right: 0;
 }
+
+.pencil-mark.invalid {
+    color: red;
+    text-decoration: line-through;
+}

@@ -21,12 +21,14 @@ export class Step {
     name: string
     domClasses: DomClass[]
     description: string
+    updateforStep: (step: Step) => void
     isComplete: boolean = false
 
-    constructor(name: string, description: string, domClasses: DomClass[]) {
+    constructor(name: string, description: string, domClasses: DomClass[], updateforStep: (step: Step) => void) {
         this.name = name
         this.description = description
         this.domClasses = domClasses
+        this.updateforStep = updateforStep
     }
 
     complete() {
@@ -41,5 +43,10 @@ export class Step {
             }
         })
         return classes
+    }
+
+    runStep() {
+        this.updateforStep(this);
+        this.complete()
     }
 }
