@@ -1,4 +1,4 @@
-import {CellRepresentation} from "../../models/CellRepresentation";
+import {CellRepresentation} from "./models/CellRepresentation";
 import './cell.css'
 
 interface PropTypes {

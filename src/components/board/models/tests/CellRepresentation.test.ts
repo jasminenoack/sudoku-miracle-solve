@@ -1,5 +1,4 @@
 import {CellRepresentation} from '../CellRepresentation'
-import {beginnerPuzzle1} from "../../puzzle-data/beginner-puzzles";
 
 describe("cell", () => {
     describe("constructor", () => {

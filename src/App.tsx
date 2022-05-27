@@ -3,7 +3,7 @@ import React from 'react';
 import './App.css';
 import {BoardDisplay} from './components/board/BoardDisplay'
 import {beginnerPuzzle1} from './puzzle-data/beginner-puzzles'
-import {BoardRepresentation} from "./models/BoardRepresentation";
+import {BoardRepresentation} from "./components/board/models/BoardRepresentation";
 
 function App() {
     const [puzzle, setPuzzle] = useState(beginnerPuzzle1)

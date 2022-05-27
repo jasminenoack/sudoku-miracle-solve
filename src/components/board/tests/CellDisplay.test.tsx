@@ -1,6 +1,6 @@
 import React from 'react';
 import {CellDisplay} from '../CellDisplay'
-import {CellRepresentation} from "../../../models/CellRepresentation";
+import {CellRepresentation} from "../models/CellRepresentation";
 import { render, screen } from '@testing-library/react';
 
 describe('CellDisplay', () => {

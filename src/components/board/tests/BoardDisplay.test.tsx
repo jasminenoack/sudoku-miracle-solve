@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import {BoardRepresentation} from "../../../models/BoardRepresentation";
+import {BoardRepresentation} from "../models/BoardRepresentation";
 import {beginnerPuzzle1} from "../../../puzzle-data/beginner-puzzles";
 import {BoardDisplay} from "../BoardDisplay";
 

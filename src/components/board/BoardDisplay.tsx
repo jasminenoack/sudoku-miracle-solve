@@ -1,4 +1,4 @@
-import {BoardRepresentation} from "../../models/BoardRepresentation";
+import {BoardRepresentation} from "./models/BoardRepresentation";
 import {CellDisplay} from "./CellDisplay";
 import './board.css'
 import {useState} from "react";
