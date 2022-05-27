@@ -1,0 +1,51 @@
+<component name="InspectionProjectProfileManager">
+  <profile version="1.0">
+    <option name="myName" value="Project Default" />
+    <inspection_tool class="DuplicatedCode" enabled="false" level="WEAK WARNING" enabled_by_default="false">
+      <Languages>
+        <language minSize="212" isEnabled="false" name="Python" />
+      </Languages>
+    </inspection_tool>
+    <inspection_tool class="Eslint" enabled="true" level="WARNING" enabled_by_default="true" />
+    <inspection_tool class="PyPackageRequirementsInspection" enabled="false" level="WARNING" enabled_by_default="false">
+      <option name="ignoredPackages">
+        <value>
+          <list size="0" />
+        </value>
+      </option>
+    </inspection_tool>
+    <inspection_tool class="PyShadowingBuiltinsInspection" enabled="true" level="WEAK WARNING" enabled_by_default="true">
+      <option name="ignoredNames">
+        <list>
+          <option value="filter" />
+        </list>
+      </option>
+    </inspection_tool>
+    <inspection_tool class="PyUnresolvedReferencesInspection" enabled="true" level="WARNING" enabled_by_default="true">
+      <option name="ignoredIdentifiers">
+        <list>
+          <option value="eshares.vesting.model_methods.VestingObjectMixin.original_issue_date" />
+          <option value="eshares.vesting.model_methods.VestingObjectMixin.vesting_manager" />
+          <option value="eshares.vesting.model_methods.VestingObjectMixin.corporation" />
+          <option value="eshares.vesting.model_methods.VestingObjectMixin._get_from_annotation" />
+          <option value="eshares.vesting.model_methods.VestingObjectMixin.corporation_id" />
+          <option value="eshares.vesting.model_methods.VestingObjectMixin.get_reserved_shares" />
+          <option value="eshares.vesting.model_methods.VestingObjectMixin.is_certificate" />
+          <option value="eshares.vesting.model_methods.VestingObjectMixin.state" />
+          <option value="eshares.vesting.model_methods.VestingObjectMixin.STATUS_CANCELED" />
+          <option value="eshares.vesting.model_methods.VestingObjectMixin.STATUS_TRANSFERRED" />
+          <option value="eshares.vesting.model_methods.VestingObjectMixin.is_grant" />
+          <option value="eshares.vesting.model_methods.VestingObjectMixin.STATUS_TERMINATED" />
+          <option value="eshares.vesting.model_methods.VestingObjectMixin.status" />
+          <option value="eshares.vesting.model_methods.VestingObjectMixin.round_share_quantity" />
+          <option value="eshares.vesting.model_methods.VestingObjectMixin.id" />
+          <option value="eshares.vesting.models.vesting_manager_mixin.VestingManagerMixin.events" />
+          <option value="object.get_changes" />
+          <option value="eshares.vesting.models.vesting_manager_mixin.VestingManagerMixin.get_fields" />
+          <option value="eshares.vesting.model_methods.VestingObjectMixin.pretty_value" />
+          <option value="eshares.vesting.models.vesting_manager_mixin.VestingManagerMixin.vesting_template_id" />
+        </list>
+      </option>
+    </inspection_tool>
+  </profile>
+</component>
