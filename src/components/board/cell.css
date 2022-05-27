@@ -1,9 +1,10 @@
 .cell {
-    height: 50px;
-    width: 50px;
+    height: 60px;
+    width: 60px;
     float: left;
     border: 1px solid yellow;
     box-sizing: border-box;
+    position: relative;
 }
 
 .cell:nth-child(9n)
@@ -104,12 +105,66 @@
 
 .filled-cell {
     font-weight: bolder;
-    font-size: 35px;
+    font-size: 45px;
     text-align: center;
-    line-height: 48px;
+    line-height: 58px;
 }
 
 .cell.selected {
     background: darkorange;
     color: black;
+}
+
+.pencil-mark {
+    font-weight: bold;
+    font-height: 18px;
+    line-height: 20px;
+    height: 20px;
+    width: 20px;
+}
+
+.pencil-mark.pencil-1 {
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+.pencil-mark.pencil-2 {
+    position: absolute;
+    top: 0;
+    left: 18px;
+}
+.pencil-mark.pencil-3 {
+    position: absolute;
+    top: 0;
+    right: 0;
+}
+.pencil-mark.pencil-4 {
+    position: absolute;
+    top: 18px;
+    left: 0;
+}
+.pencil-mark.pencil-5 {
+    position: absolute;
+    top: 18px;
+    left: 18px;
+}
+.pencil-mark.pencil-6 {
+    position: absolute;
+    top: 18px;
+    right: 0;
+}
+.pencil-mark.pencil-7 {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+}
+.pencil-mark.pencil-8 {
+    position: absolute;
+    bottom: 0;
+    left: 18px;
+}
+.pencil-mark.pencil-9 {
+    position: absolute;
+    bottom: 0;
+    right: 0;
 }

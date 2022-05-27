@@ -8,6 +8,7 @@ import {BoardRepresentation} from "./components/board/models/BoardRepresentation
 function App() {
     const [puzzle, setPuzzle] = useState(beginnerPuzzle1)
     const board = new BoardRepresentation(puzzle);
+    board.cells[0].addAllPencilMarks()
     return (
         <div className="App">
             <header className="App-header">

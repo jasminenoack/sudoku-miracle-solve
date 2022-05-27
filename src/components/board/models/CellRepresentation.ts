@@ -1,4 +1,4 @@
-class PencilMark {
+export class PencilMark {
     value: number
     invalid: boolean = false
 
