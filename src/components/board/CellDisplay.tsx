@@ -60,6 +60,9 @@ export function CellDisplay ({cell, index}: PropTypes) {
             classes = classes.concat(newClasses)
         }
     }
+    if (cell.addedValue) {
+        classes.push('filled-in')
+    }
 
     function onClick() {
         setSelectedCell(selected ? undefined : index)

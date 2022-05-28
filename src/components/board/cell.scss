@@ -107,6 +107,10 @@
         line-height: 58px;
     }
 
+    &.filled-in {
+        color: lightblue;
+    }
+
     &.selected {
         background: navy;
         color: white;
