@@ -411,7 +411,7 @@ export class ProcedureBuilderHelper {
         ruleBuilders: ((index: number) => Rule)[]
     ): Procedure  {
         let disabled = false;
-        if (!index || board[index].value) {
+        if (index === undefined || board[index].value) {
             disabled = true
         }
         if (disabled) {

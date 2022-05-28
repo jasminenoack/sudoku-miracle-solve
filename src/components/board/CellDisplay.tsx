@@ -18,7 +18,7 @@ function PencilMarkDisplay(
         pencilMarkStatus: string,
     }) {
     const classes = [
-        'pencil-mark', `pencil-${pencilMarkValue}`, pencilMarkStatus
+        'pencil-mark', `pencil-${pencilMarkValue}`, pencilMarkStatus,  `value-${pencilMarkValue}`
     ]
     return (
         <div key={pencilMarkValue} className={classes.join(' ')}>{pencilMarkValue}</div>
@@ -29,7 +29,7 @@ export function CellDisplay ({cell, index}: PropTypes) {
     const {selectedCell, setSelectedCell, runningProcedure} = useContext(BoardContext);
 
     const value = cell.value
-    let classes: string[] = ['cell'];
+    let classes: string[] = ['cell', `value-${value}`];
     if (value) {
         classes.push('filled-cell')
     }
