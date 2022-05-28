@@ -115,6 +115,11 @@
     color: black;
 }
 
+.cell.processing-cell {
+    background: purple;
+    color: white;
+}
+
 .pencil-mark {
     font-weight: bold;
     font-height: 18px;

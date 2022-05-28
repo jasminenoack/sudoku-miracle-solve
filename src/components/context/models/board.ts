@@ -104,4 +104,34 @@ export class BoardHelpers {
     static copyBoard(board: Board): Board {
         return board.map(cell => CellHelpers.copyCell(cell))
     }
+
+    static replaceCells(board: Board, updates: {index: number, newCell: Cell}[]): Board {
+        const newBoard = JSON.parse(JSON.stringify(board))
+        updates.forEach(({index, newCell}) => {
+            newBoard[index] = newCell
+        })
+        return newBoard
+    }
+
+    static getIndexesForRowContaining(index: number): number[] {
+        const rowStart = Math.floor(index/9) * 9
+        return [0, 1, 2, 3, 4, 5, 6, 7, 8].map(value => rowStart + value)
+    }
+
+    static getIndexesForSquareContaining(index: number): number[] {
+        const rowSquareStart = Math.floor(index/27) * 27
+        const columnStart = index % 9
+        const columnSquareStart = Math.floor(columnStart/3) * 3
+        const squareStart = rowSquareStart + columnSquareStart
+        return [0, 1, 2, 9, 10, 11, 18, 19, 20].map(value => squareStart + value)
+    }
+
+    static getIndexesForColumnContaining(index: number): number[] {
+        const columnStart = index % 9
+        return [0, 9, 18, 27, 36, 45, 54, 63, 72].map(value => columnStart + value)
+    }
+
+    static getValuesForIndexes(board: Board, indexes: number[]): number[] {
+        return indexes.map(index => board[index].value).filter(value => value).sort() as number[]
+    }
 }

@@ -1,26 +1,16 @@
-import React from 'react'
-import {AbstractProcedure} from "./models/ProcedureInterface";
-import {PencilMarksProcedure} from "./models/PencilMarksProcedure";
-import {Board} from "../context/models/board";
+import React, {useContext} from 'react'
+import {BoardContext} from "../context/BoardContext";
+import {ProcedureBuilderHelper} from "../context/models/procedures";
 
 
-export function PencilMarksStartDisplay (
-    {
-        setRunningProcedure,
-        board,
-        selectedCell
-    }:{
-        setRunningProcedure: (procedure: AbstractProcedure) => void,
-        board: Board,
-        selectedCell: number | undefined,
-    }
-) {
+export function PencilMarksStartDisplay () {
+    const {selectedCell, currentPuzzle, setRunningProcedure} = useContext(BoardContext);
     const text = "Add pencil marks"
-    if (!PencilMarksProcedure.canRunProcedure(selectedCell, board)) {
+    if (!selectedCell || currentPuzzle[selectedCell].value) {
         return <button disabled>{text}</button>
     }
     function chooseProcedure() {
-        setRunningProcedure(new PencilMarksProcedure(board, selectedCell!))
+        setRunningProcedure(ProcedureBuilderHelper.buildPencilMarksProcedure(currentPuzzle, selectedCell!))
     }
     return <button onClick={chooseProcedure}>{text}</button>
 }

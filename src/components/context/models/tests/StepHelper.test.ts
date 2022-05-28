@@ -1,4 +1,23 @@
-import {DomClassHelper, StepHelper} from "../procedures";
+import {DomClassHelper, Step, StepHelper} from "../procedures";
+import {BoardHelpers} from "../board";
+import {beginnerPuzzle1} from "../../../../puzzle-data/beginner-puzzles";
+
+function getBoard() {
+    return BoardHelpers.buildBoard(beginnerPuzzle1);
+}
+
+function getStep () {
+    const fun = (step: Step) => ({newStep: StepHelper.updateStep({
+        descriptionOfChange: 'new-description',
+    }, step), newBoard: getBoard()})
+    const domClasses = [
+        DomClassHelper.buildDomClass(
+            'test-row',
+            [18, 19, 20, 21, 22, 23, 24, 25, 26]
+        )
+    ]
+    return StepHelper.buildStep('test', domClasses, fun)
+}
 
 describe('getClassesByIndex', () => {
     it('returns classes by index', () => {
@@ -33,6 +52,74 @@ describe('getClassesByIndex', () => {
             75: ['test-column'],
         }
         expect(StepHelper.getClassesByIndex(domClasses)).toEqual(classesByIndex)
+    })
+})
+
+
+describe('buildStep', () => {
+    it('builds step', () => {
+        const fun = () => ({} as any)
+        const domClasses = [
+            DomClassHelper.buildDomClass(
+                'test-row',
+                [18, 19, 20, 21, 22, 23, 24, 25, 26]
+            )
+        ]
+        const step = StepHelper.buildStep('test', domClasses, fun)
+        expect(step).toEqual({
+            name: 'test',
+            descriptionOfChange: '',
+            domClasses: domClasses,
+            updateForStep: fun,
+            isComplete: false,
+            inProgress: false,
+        })
+    })
+})
+
+describe('updateStep', () => {
+    it('updates fields for step', () => {
+        const step = getStep()
+        const newStep = StepHelper.updateStep(
+          {descriptionOfChange: 'new description', inProgress: true}, step
+        )
+        expect(newStep).toEqual({
+            name: 'test',
+            descriptionOfChange: 'new description',
+            domClasses: step.domClasses,
+            updateForStep: step.updateForStep,
+            isComplete: false,
+            inProgress: true,
+        })
+    })
+})
+
+describe('incrementStep', () => {
+    it('should move step to in progress if not started', () => {
+        const step = getStep()
+        const board = getBoard()
+        const {newStep} = StepHelper.incrementStep(step, board)
+        expect(newStep.descriptionOfChange).toEqual('new-description')
+        expect(newStep.inProgress).toEqual(true)
+    });
+
+    it('should move step to complete if in progress', () => {
+        const step = getStep()
+        const board = getBoard()
+        step.inProgress = true
+        const {newStep} = StepHelper.incrementStep(step, board)
+        expect(newStep.descriptionOfChange).toEqual('')
+        expect(newStep.isComplete).toEqual(true)
+    });
+
+    it('should run complete function if present', () => {
+        let ranComplete = false;
+        const step = getStep()
+        step.completeStep = (() => ranComplete = true) as any;
+        const board = getBoard()
+        step.inProgress = true
+        const {newStep} = StepHelper.incrementStep(step, board)
+        expect(ranComplete).toEqual(true)
     })
 })
 

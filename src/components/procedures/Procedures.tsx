@@ -1,29 +1,14 @@
-import React from 'react'
-import './procedures.css'
+import React, {useContext} from 'react'
 import {PencilMarksStartDisplay} from "./PencilMarksDisplay";
-import {AbstractProcedure} from "./models/ProcedureInterface";
-import {Step} from "../steps/models/Step";
-import {Board} from "../context/models/board";
+import {BoardContext} from "../context/BoardContext";
+import {Procedure, ProcedureHelper, Rule, RuleHelper, Step} from "../context/models/procedures";
+import './procedures.css'
 
-export function StartProceduresMenu (
-    {
-        setRunningProcedure,
-        board,
-        selectedCell,
-    }:{
-        setRunningProcedure: (procedure: AbstractProcedure | undefined) => void,
-        board: Board,
-        selectedCell: number | undefined,
-    }
-) {
+export function StartProceduresMenu () {
     return (
-        <div className='procedures'>
+        <div>
             <header>Start Procedure:</header>
-            <PencilMarksStartDisplay
-                setRunningProcedure={setRunningProcedure}
-                board={board}
-                selectedCell={selectedCell}
-            />
+            <PencilMarksStartDisplay/>
         </div>
     )
 }
@@ -36,8 +21,12 @@ function RunStep (
         step: Step
     }
 ) {
+    const {runningProcedure, currentPuzzle, setRunningProcedure, setCurrentPuzzle} = useContext(BoardContext);
+
     function runStep() {
-        step.runStep();
+        const {newProcedure, newBoard} = ProcedureHelper.incrementProcedure(runningProcedure!, currentPuzzle)
+        setRunningProcedure(newProcedure)
+        setCurrentPuzzle(newBoard)
     }
     return (
         <div>
@@ -53,61 +42,78 @@ function CompleteStep (
         step: Step
     }
 ) {
+    const {runningProcedure, currentPuzzle, setRunningProcedure} = useContext(BoardContext);
     function completeStep() {
-        step.complete();
-
+        const {newProcedure} = ProcedureHelper.incrementProcedure(runningProcedure!, currentPuzzle)
+        setRunningProcedure(newProcedure)
     }
     return (
         <div>
-            <p>{step.description}</p>
+            <p>{step.descriptionOfChange}</p>
             <button onClick={completeStep}>Complete Step: {step.name}</button>
         </div>
     );
 }
 
-function CompleteProcedure (
-    {
-        runningProcedure,
-        setRunningProcedure,
-    }: {
-        runningProcedure: AbstractProcedure
-        setRunningProcedure: (procedure: AbstractProcedure | undefined) => void,
-    }
-) {
+function CompleteProcedure () {
+    const {setRunningProcedure} = useContext(BoardContext);
     function completeProcedure() {
         setRunningProcedure(undefined);
     }
     return (
         <div>
-            <button onClick={completeProcedure}>Complete Procedure: {runningProcedure.name}</button>
+            <button onClick={completeProcedure}>Complete Procedure</button>
         </div>
     );
 }
 
+export function RuleDisplay({rule}: {rule: Rule}) {
+    const step = RuleHelper.getCurrentStep(rule)
+    let inner;
+    if (!step!.inProgress) {
+        inner = <RunStep step={step!}/>
+    } else {
+        inner = <CompleteStep step={step!}/>
+    }
+    return (<><div className="rule">{`Rule: ${rule.name}`}</div>{inner}</>)
+}
+
 export function RunningProcedure(
     {
-        setRunningProcedure,
         runningProcedure
     }: {
-        runningProcedure: AbstractProcedure
-        setRunningProcedure: (procedure: AbstractProcedure | undefined) => void,
+        runningProcedure: Procedure
     }
 ) {
-    const nextStep = runningProcedure.getCurrentStep();
+    const rule = ProcedureHelper.getCurrentRule(runningProcedure)
     let inner;
-    if (!nextStep) {
-        inner = <CompleteProcedure runningProcedure={runningProcedure} setRunningProcedure={setRunningProcedure}/>
-    } else if (nextStep.inProgress) {
-        inner = <CompleteStep step={nextStep}/>
+    if (rule) {
+        inner = <RuleDisplay rule={rule}/>
     } else {
-        inner = <RunStep step={nextStep}/>
+        inner = <CompleteProcedure />
     }
 
-    const step = runningProcedure.getCurrentStep();
     return (
-        <div className='procedures'>
+        <>
             <header>Running: {runningProcedure.name}</header>
             {inner}
+        </>
+    )
+}
+
+export function ProcedureDisplay() {
+    const {runningProcedure} = useContext(BoardContext);
+
+    function getInner() {
+        if (runningProcedure) {
+            return <RunningProcedure runningProcedure={runningProcedure}/>
+        } else {
+            return <StartProceduresMenu/>
+        }
+    }
+    return (
+        <div className='procedures'>
+            {getInner()}
         </div>
     )
 }

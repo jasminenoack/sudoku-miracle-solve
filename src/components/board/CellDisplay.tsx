@@ -1,7 +1,8 @@
 import React, {useContext} from 'react'
 import './cell.css'
-import {Cell} from "../context/models/board";
+import {Cell, CellHelpers} from "../context/models/board";
 import {BoardContext} from "../context/BoardContext";
+import {ProcedureHelper, StepHelper} from "../context/models/procedures";
 
 interface PropTypes {
     cell: Cell;
@@ -25,16 +26,29 @@ function PencilMarkDisplay(
 }
 
 export function CellDisplay ({cell, index}: PropTypes) {
-    const {selectedCell, setSelectedCell} = useContext(BoardContext);
+    const {selectedCell, setSelectedCell, runningProcedure} = useContext(BoardContext);
 
     const value = cell.value
-    const classes: string[] = ['cell'];
+    let classes: string[] = ['cell'];
     if (value) {
         classes.push('filled-cell')
     }
     const selected = selectedCell === index
     if (selected) {
         classes.push('selected')
+    }
+    console.log(index, "classes", classes)
+    console.log(runningProcedure)
+    if (runningProcedure) {
+        const currentStep = ProcedureHelper.getCurrentStep(runningProcedure)
+        if (currentStep) {
+            console.log(StepHelper.getClassesByIndex(currentStep.domClasses))
+            console.log(selectedCell)
+            const newClasses = StepHelper.getClassesByIndex(currentStep.domClasses)[index]
+            if (newClasses) {
+                classes = classes.concat(newClasses)
+            }
+        }
     }
 
     function onClick() {
