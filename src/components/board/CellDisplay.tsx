@@ -31,7 +31,7 @@ function PencilMarkDisplay(
 
 export function CellDisplay ({cell, index}: PropTypes) {
     const {selectedValues} = useContext(BoardContext)
-    const {selectedCell, setSelectedCell, runningProcedure} = useContext(BoardContext);
+    const {selectedCell, setSelectedCell, runningProcedure, runningSpecialProcedure} = useContext(BoardContext);
 
     const value = cell.value
     let classes: string[] = ['cell'];
@@ -46,13 +46,18 @@ export function CellDisplay ({cell, index}: PropTypes) {
         classes.push('selected')
     }
 
+    let currentStep;
     if (runningProcedure) {
-        const currentStep = ProcedureHelper.getCurrentStep(runningProcedure)
-        if (currentStep) {
-            const newClasses = StepHelper.getClassesByIndex(currentStep.domClasses)[index]
-            if (newClasses) {
-                classes = classes.concat(newClasses)
-            }
+        currentStep = ProcedureHelper.getCurrentStep(runningProcedure)
+        classes.push('procedure')
+    } else if (runningSpecialProcedure) {
+        currentStep = ProcedureHelper.getCurrentStep(runningSpecialProcedure)
+        classes.push('special-procedure')
+    }
+    if (currentStep) {
+        const newClasses = StepHelper.getClassesByIndex(currentStep.domClasses)[index]
+        if (newClasses) {
+            classes = classes.concat(newClasses)
         }
     }
 

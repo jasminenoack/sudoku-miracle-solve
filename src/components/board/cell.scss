@@ -116,8 +116,13 @@
         color: black;
     }
 
-    &.processing-cell {
+    &.processing-cell.prodecure {
         background: purple;
+        color: white;
+    }
+
+    &.processing-cell.special-procedure {
+        background: dodgerblue;
         color: white;
     }
 

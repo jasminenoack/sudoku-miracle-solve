@@ -172,17 +172,3 @@ describe('allOtherValuesCanExistTogether', () => {
         })
     })
 })
-
-describe('valueIsValid', () => {
-    it('should return true if all cells have working values', () => {
-
-    })
-
-    it('should return false if any neighbor ends up with zero options', () => {
-
-    })
-
-    it('should return false if neighbors share values so they would have to share a value', () => {
-
-    })
-})

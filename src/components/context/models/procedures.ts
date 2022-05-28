@@ -366,10 +366,12 @@ export class StepBuilderHelper {
         )
     }
 
-    static buildStepsForCheckingValidCellDiagonalDeltaFour(index: number, board: Board): Step[] {
+    static buildStepsForCheckingValidCellDiagonalDeltaFour(index: number, startingBoard: Board): Step[] {
         const indexes = BoardHelpers.getIndexesForAdjacentPositiveDiagonals(index)
         function buildStep(index: number, value: number): Step {
             function processingFunction(step: Step, board: Board): {newBoard: Board, newStep: Step} {
+                const cell = board[index]
+                const neighbors = indexes.map(index => board[index])
                 const checker = new CheckForDeltaAllowableValueGroupedNeighbors(
                     value,
                     cell,
@@ -411,9 +413,8 @@ export class StepBuilderHelper {
                 completeStep,
             )
         }
-        const cell = board[index]
-        const cellValues = CellHelpers.getCurrentPencilMarks(cell)
-        const neighbors = indexes.map(index => board[index])
+        const currentCell = startingBoard[index]
+        const cellValues = CellHelpers.getCurrentPencilMarks(currentCell)
         return cellValues.map(value => buildStep(index, value))
     }
 }
