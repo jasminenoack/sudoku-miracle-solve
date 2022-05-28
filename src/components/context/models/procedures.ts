@@ -1,5 +1,4 @@
 import {Board, BoardHelpers, CellHelpers} from "./board";
-import React from "react";
 
 export interface DomClass {
     className: string,
@@ -364,42 +363,51 @@ export class StepBuilderHelper {
 }
 
 export class RuleBuilderHelper {
-    static buildAllValuesPossibleRule (index: number) {
+    static _ruleBuilder(index: number, name: string, builders: ((index: number) => Step)[]): Rule {
         return {
-            name: 'All values can be made',
-            steps: [
-                StepBuilderHelper.buildAddAllValuesStep(index)
-            ]
+            name: name,
+            steps: builders.map(builder => builder(index))
         }
+    }
+
+    static buildAllValuesPossibleRule (index: number) {
+        return RuleBuilderHelper._ruleBuilder(
+            index,
+            'All values can be made',
+            [StepBuilderHelper.buildAddAllValuesStep]
+        )
     }
 
     static buildOnlyOncePerRule(index: number): Rule {
-        return {
-            name: 'Values only occur once in a column, row, or square',
-            steps: [
-                StepBuilderHelper.buildOncePerSquareStep(index),
-                StepBuilderHelper.buildOncePerRowStep(index),
-                StepBuilderHelper.buildOncePerColumnStep(index)
+        return RuleBuilderHelper._ruleBuilder(
+            index,
+            'Values only occur once in a column, row, or square',
+            [
+                StepBuilderHelper.buildOncePerSquareStep,
+                StepBuilderHelper.buildOncePerRowStep,
+                StepBuilderHelper.buildOncePerColumnStep,
             ]
-        }
+        )
     }
 
     static buildOnlyOncePerDiagonalRule(index: number): Rule {
-        return {
-            name: 'Values only occur once in a column, row, or square',
-            steps: [
-                StepBuilderHelper.buildOnlyOncePerDiagonal(index),
+        return RuleBuilderHelper._ruleBuilder(
+            index,
+            'Values only occur once in a column, row, or square',
+            [
+                StepBuilderHelper.buildOnlyOncePerDiagonal,
             ]
-        }
+        )
     }
 
     static buildPositiveDiagonalDeltaFour(index: number): Rule {
-        return {
-            name: 'Values adjacent in positive diagonals must be 4 greater than or equal to the next number',
-            steps: [
-                StepBuilderHelper.buildPositiveDiagonalDeltaFour(index)
+        return RuleBuilderHelper._ruleBuilder(
+            index,
+            'Values adjacent in positive diagonals must be 4 greater than or equal to the next number',
+            [
+                StepBuilderHelper.buildPositiveDiagonalDeltaFour,
             ]
-        }
+        )
     }
 }
 
