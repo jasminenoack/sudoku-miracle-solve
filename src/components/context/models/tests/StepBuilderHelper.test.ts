@@ -101,6 +101,23 @@ function getPositiveDiagonalDeltaFour() {
     )
 }
 
+function getSetCellIfOnlyInDiagonal() {
+    return StepHelper.buildStep(
+        'Set cell to value, if it holds the only instance in of a value in diagonal',
+        [
+            DomClassHelper.buildDomClass(
+                StepBuilderHelper.processingClassName,
+                [4]
+            ),
+            DomClassHelper.buildDomClass(
+                StepBuilderHelper.scanningClassName,
+                [12, 20, 28, 36, 4]
+            )
+        ],
+        () => ({} as any)
+    )
+}
+
 function getBoard() {
     return BoardHelpers.buildBoard(beginnerPuzzle1);
 }
@@ -447,6 +464,52 @@ describe('buildStepsForCheckingValidCellDiagonalDeltaFour', () => {
         expect(result1.newStep.descriptionOfChange).toEqual("Neighbor values could exist together: [6]")
     })
 });
+
+describe('buildStepSetCellToOnlyValueInDiagonal', () => {
+    it('should set values', () => {
+        const board = getBoard()
+        const step = StepBuilderHelper.buildStepSetCellToOnlyValueInDiagonal(4);
+        [12, 20, 28, 36].forEach(index => {
+            board[index].pencilMarks['5'] = 'not_present'
+        })
+        expect(step.name).toEqual(getSetCellIfOnlyInDiagonal().name)
+        expect(step.domClasses).toEqual(getSetCellIfOnlyInDiagonal().domClasses)
+        expect(step.isComplete).toEqual(false)
+        expect(step.inProgress).toEqual(false)
+        expect(step.descriptionOfChange).toEqual('')
+        expect(board[4].pencilMarks).toEqual(CellHelpers.buildPencilMarks())
+    })
+
+    it('should set the function to update', () => {
+        const board = getBoard()
+        const step = StepBuilderHelper.buildStepSetCellToOnlyValueInDiagonal(4);
+        [12, 20, 28, 36].forEach(index => {
+            board[index].pencilMarks['5'] = 'not_present'
+        })
+        const {newStep, newBoard} = step.updateForStep(step, board)
+        expect(newStep.name).toEqual(getSetCellIfOnlyInDiagonal().name)
+        expect(newStep.domClasses).toEqual(getSetCellIfOnlyInDiagonal().domClasses)
+        expect(newStep.isComplete).toEqual(false)
+        expect(newStep.inProgress).toEqual(false)
+        expect(newStep.descriptionOfChange).toEqual("value 5 only occurs in the target cell")
+        expect(newBoard[4].value).toEqual(5)
+        expect(newBoard[4].addedValue).toEqual(true);
+    })
+
+    it('should set the function to update even if no matches', () => {
+        const board = getBoard()
+        const step = StepBuilderHelper.buildStepSetCellToOnlyValueInDiagonal(4);
+        const {newStep, newBoard} = step.updateForStep(step, board)
+        expect(newStep.name).toEqual(getSetCellIfOnlyInDiagonal().name)
+        expect(newStep.domClasses).toEqual(getSetCellIfOnlyInDiagonal().domClasses)
+        expect(newStep.isComplete).toEqual(false)
+        expect(newStep.inProgress).toEqual(false)
+        expect(newStep.descriptionOfChange).toEqual("No value occurs only in the target cell. TargetValues: [1,2,3,4,5,6,7,8,9] other values: [6,8,1,2,3,4,5,7,9]")
+        expect(newBoard[4].value).toEqual(undefined)
+        expect(newBoard[4].addedValue).toEqual(false);
+    })
+})
+
 
 //  0  1  2   3  4  5   6  7  8
 //  9 10 11  12 13 14  15 16 17

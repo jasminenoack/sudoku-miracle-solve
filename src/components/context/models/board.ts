@@ -16,6 +16,7 @@ export interface PencilMarks {
 export interface Cell {
     value: number | undefined;
     pencilMarks: PencilMarks;
+    addedValue: boolean;
 }
 
 export type Board = Cell[]
@@ -39,6 +40,7 @@ export class CellHelpers {
         return {
             value: value,
             pencilMarks: CellHelpers.buildPencilMarks(),
+            addedValue: false,
         }
     }
 
@@ -102,6 +104,13 @@ export class CellHelpers {
 
     static isStarted(cell: Cell) {
         return cell.value !== undefined || CellHelpers.getCurrentPencilMarks(cell).length
+    }
+
+    static fillInCell(cell: Cell, value: number): Cell {
+        const newCell = CellHelpers.copyCell(cell)
+        newCell.value = value 
+        newCell.addedValue = true
+        return newCell
     }
 }
 

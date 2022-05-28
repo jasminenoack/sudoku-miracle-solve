@@ -1,5 +1,6 @@
 import {Board, BoardHelpers, CellHelpers, Cell} from "./board";
 import {CheckForDeltaAllowableValueGroupedNeighbors} from "./helpers/CheckForDeltaAllowableValues";
+import { FindValueThatExistsInOneLocation } from "./helpers/FindValueThatExistsInOneLocation";
 
 export interface DomClass {
     className: string,
@@ -417,6 +418,69 @@ export class StepBuilderHelper {
         const cellValues = CellHelpers.getCurrentPencilMarks(currentCell)
         return cellValues.map(value => buildStep(index, value))
     }
+
+    static _buildStepCellAsOnlyCellWithValue(index: number, indexes: number[], type: string): Step {
+        function processingFunction(step: Step, board: Board): {newBoard: Board, newStep: Step} {
+            const cell = board[index]
+            const neighbors = indexes.map(index => board[index])
+            const checker = new FindValueThatExistsInOneLocation(
+                cell,
+                neighbors,
+            )
+            const {value, message} = checker.getResult()
+            let newCell = cell
+            if (value) {
+                newCell = CellHelpers.fillInCell(cell, value)
+            }
+            const newBoard = BoardHelpers.replaceCells(
+                board,
+                [{index, newCell}]
+            )
+            const newStep = StepHelper.updateStep(
+                {descriptionOfChange: message},
+                step,
+            )
+            return {
+                newStep,
+                newBoard,
+            }
+        }
+
+        return StepHelper.buildStep(
+            `Set cell to value, if it holds the only instance in of a value in ${type}`,
+            [
+                DomClassHelper.buildDomClass(
+                    StepBuilderHelper.processingClassName,
+                    [index],
+                ),
+                DomClassHelper.buildDomClass(
+                    StepBuilderHelper.scanningClassName,
+                    indexes,
+                ),
+            ],
+            processingFunction,
+        )
+    }
+
+    static buildStepSetCellToOnlyValueInDiagonal(index: number): Step {
+        const indexes = BoardHelpers.getIndexesForPositiveDiagonals(index)
+        return StepBuilderHelper._buildStepCellAsOnlyCellWithValue(index, indexes, 'diagonal')
+    }
+
+    static buildStepSetCellToOnlyValueInRow(index: number): Step {
+        const indexes = BoardHelpers.getIndexesForRowContaining(index)
+        return StepBuilderHelper._buildStepCellAsOnlyCellWithValue(index, indexes, 'diagonal')
+    }
+
+    static buildStepSetCellToOnlyValueInColumn(index: number): Step {
+        const indexes = BoardHelpers.getIndexesForColumnContaining(index)
+        return StepBuilderHelper._buildStepCellAsOnlyCellWithValue(index, indexes, 'diagonal')
+    }
+
+    static buildStepSetCellToOnlyValueInSquare(index: number): Step {
+        const indexes = BoardHelpers.getIndexesForSquareContaining(index)
+        return StepBuilderHelper._buildStepCellAsOnlyCellWithValue(index, indexes, 'diagonal')
+    }
 }
 
 export class RuleBuilderHelper {
@@ -479,6 +543,38 @@ export class RuleBuilderHelper {
             index,
             'A number must allow for each adjacent number on the positive diagonal to follow the 4 delta rule',
             StepBuilderHelper.buildStepsForCheckingValidCellDiagonalDeltaFour(index, board)
+        )
+    }
+
+    static buildFillInOnlyInstanceInRow(index: number) {
+        return RuleBuilderHelper._ruleBuilder(
+            index,
+            'Fill in only instance in row',
+            [StepBuilderHelper.buildStepSetCellToOnlyValueInRow]
+        )
+    }
+
+    static buildFillInOnlyInstanceInDiagonal(index: number) {
+        return RuleBuilderHelper._ruleBuilder(
+            index,
+            'Fill in only instance in diagonal',
+            [StepBuilderHelper.buildStepSetCellToOnlyValueInDiagonal]
+        )
+    }
+
+    static buildFillInOnlyInstanceInColmun(index: number) {
+        return RuleBuilderHelper._ruleBuilder(
+            index,
+            'Fill in only instance in column',
+            [StepBuilderHelper.buildStepSetCellToOnlyValueInColumn]
+        )
+    }
+
+    static buildFillInOnlyInstanceInSquare(index: number) {
+        return RuleBuilderHelper._ruleBuilder(
+            index,
+            'Fill in only instance in square',
+            [StepBuilderHelper.buildStepSetCellToOnlyValueInSquare]
         )
     }
 }
@@ -544,6 +640,42 @@ export class ProcedureBuilderHelper {
             index,
             'Group delta 4 conflict',
             [() => RuleBuilderHelper.buildRuleToCheckForDelta4Compliance(index, board)]
+        )
+    }
+
+    static buildFillInOnlyInstanceInRow(board: Board, index: number): Procedure {
+        return ProcedureBuilderHelper._buildProcedureForEmptyMarkedCell(
+            board,
+            index,
+            'Fill Only Instance in row',
+            [RuleBuilderHelper.buildFillInOnlyInstanceInRow]
+        )
+    }
+
+    static buildFillInOnlyInstanceInColumn(board: Board, index: number): Procedure {
+        return ProcedureBuilderHelper._buildProcedureForEmptyMarkedCell(
+            board,
+            index,
+            'Fill Only Instance in column',
+            [RuleBuilderHelper.buildFillInOnlyInstanceInColmun]
+        )
+    }
+
+    static buildFillInOnlyInstanceInDiagonal(board: Board, index: number): Procedure {
+        return ProcedureBuilderHelper._buildProcedureForEmptyMarkedCell(
+            board,
+            index,
+            'Fill Only Instance in diagonal',
+            [RuleBuilderHelper.buildFillInOnlyInstanceInDiagonal]
+        )
+    }
+
+    static buildFillInOnlyInstanceInSquare(board: Board, index: number): Procedure {
+        return ProcedureBuilderHelper._buildProcedureForEmptyMarkedCell(
+            board,
+            index,
+            'Fill Only Instance in square',
+            [RuleBuilderHelper.buildFillInOnlyInstanceInSquare]
         )
     }
 }

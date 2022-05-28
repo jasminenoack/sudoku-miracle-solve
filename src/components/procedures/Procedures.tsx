@@ -30,11 +30,17 @@ function ProceduresItem (
 export function StartProceduresMenu () {
     const {selectedCell, currentPuzzle} = useContext(BoardContext);
     const onlyOnce = ProcedureBuilderHelper.buildOnlyOnceProcedure(currentPuzzle, selectedCell!)
+    const fillInOnlyInColumn = ProcedureBuilderHelper.buildFillInOnlyInstanceInColumn(currentPuzzle, selectedCell!)
+    const fillInOnlyInRow = ProcedureBuilderHelper.buildFillInOnlyInstanceInRow(currentPuzzle, selectedCell!)
+    const fillInOnlyInSquare = ProcedureBuilderHelper.buildFillInOnlyInstanceInSquare(currentPuzzle, selectedCell!)
 
     return (
         <div>
             <header>Start Procedure:</header>
             <ProceduresItem procedure={onlyOnce}/>
+            <ProceduresItem procedure={fillInOnlyInColumn}/>
+            <ProceduresItem procedure={fillInOnlyInRow}/>
+            <ProceduresItem procedure={fillInOnlyInSquare}/>
         </div>
     )
 }

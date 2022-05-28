@@ -15,7 +15,8 @@ function buildCheckerWithNeighbors(value: number = 4, delta: number=4) {
             7: 'valid',
             8: 'valid',
             9: 'valid',
-        }
+        },
+        addedValue: false
     }
 
     const neighbor1: Cell = {
@@ -30,7 +31,8 @@ function buildCheckerWithNeighbors(value: number = 4, delta: number=4) {
             7: 'not_present',
             8: 'not_present',
             9: 'not_present',
-        }
+        },
+        addedValue: false
     }
 
     const neighbor2: Cell = {
@@ -45,7 +47,8 @@ function buildCheckerWithNeighbors(value: number = 4, delta: number=4) {
             7: 'valid',
             8: 'valid',
             9: 'valid',
-        }
+        },
+        addedValue: false
     }
 
     const neighbor3: Cell = {
@@ -60,7 +63,8 @@ function buildCheckerWithNeighbors(value: number = 4, delta: number=4) {
             7: 'valid',
             8: 'not_present',
             9: 'not_present',
-        }
+        },
+        addedValue: false
     }
 
     return new CheckForDeltaAllowableValueGroupedNeighbors(

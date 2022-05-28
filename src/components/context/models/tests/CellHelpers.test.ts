@@ -2,11 +2,11 @@ import {Cell, CellHelpers, PencilMarks} from "../board";
 
 
 function cellWithValue(): Cell {
-    return {value: 4, pencilMarks: CellHelpers.buildPencilMarks()}
+    return {value: 4, pencilMarks: CellHelpers.buildPencilMarks(), addedValue: false}
 }
 
 function cellWithoutValue(): Cell {
-    return {value: undefined, pencilMarks: CellHelpers.buildPencilMarks()}
+    return {value: undefined, pencilMarks: CellHelpers.buildPencilMarks(), addedValue: false}
 }
 
 function cellWithPencilMarks(): Cell {
@@ -20,7 +20,7 @@ function cellWithPencilMarks(): Cell {
             7: 'valid',
             8: 'not_present',
             9: 'not_present',
-        }}
+        }, addedValue: false}
 }
 
 describe('buildPencilMarks', () => {
@@ -56,12 +56,12 @@ describe('buildPencilMarks', () => {
 describe('buildCell', () => {
     it('should build a cell with a value', () => {
         const cell = CellHelpers.buildCell(4)
-        expect(cell).toEqual({value: 4, pencilMarks: CellHelpers.buildPencilMarks()})
+        expect(cell).toEqual({value: 4, pencilMarks: CellHelpers.buildPencilMarks(), addedValue: false})
     })
 
     it('should build a cell without a value', () => {
         const cell = CellHelpers.buildCell(undefined)
-        expect(cell).toEqual({value: undefined, pencilMarks: CellHelpers.buildPencilMarks()})
+        expect(cell).toEqual({value: undefined, pencilMarks: CellHelpers.buildPencilMarks(), addedValue: false})
     })
 })
 
@@ -221,7 +221,7 @@ describe('removeInvalidPencilMarksFromCell', () => {
             7: 'valid',
             8: 'invalid',
             9: 'not_present',
-        } as PencilMarks};
+        } as PencilMarks, addedValue: false};
         const newCell = CellHelpers.removeInvalidPencilMarksFromCell(cell)
         expect(newCell.pencilMarks).toEqual({
             1: 'valid',
@@ -272,5 +272,14 @@ describe('isStarted', () => {
         let cell = cellWithoutValue()
         cell = CellHelpers.removeAllPencilMarksFromCell(cell);
         expect(CellHelpers.isStarted(cell)).toBeFalsy()
+    })
+})
+
+describe('fillInCell', () =>{
+    it('should fill in the cell', () => {
+        const cell = cellWithPencilMarks()
+        const newCell = CellHelpers.fillInCell(cell, 5)
+        expect(newCell.value).toEqual(5)
+        expect(newCell.addedValue).toBeTruthy()
     })
 })

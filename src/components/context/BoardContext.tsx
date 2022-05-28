@@ -141,6 +141,14 @@ function setUpBoard(): Board {
         ...checkRelatedDelta4(diagonal9.reverse()),
         // remove values in the middle left square that can't work with related diagonal swuares 
         ...checkRelatedDelta4(square4.reverse()),
+        // remove the sixes from the row with the 2 in it
+        ...checkRelatedDelta4(diagonal11.reverse()),
+
+        // testing stuff 
+        // ...checkOnlyOne(allSquares),
+        // ...checkOncePerDiagonal(allSquares),
+        // ...checkDelta4Diagonal(allSquares),
+        // ...checkRelatedDelta4(allSquares),
     ]
     const updates: {[key: string]: number[]} = {}
     let index = 0

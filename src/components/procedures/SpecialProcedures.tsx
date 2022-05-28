@@ -32,12 +32,14 @@ function StartProceduresMenu () {
     const onlyOncePerDiagonal = ProcedureBuilderHelper.buildOnlyOncePerDiagonal(currentPuzzle, selectedCell!)
     const diagonalDelta4 = ProcedureBuilderHelper.buildPositiveDiagonalDeltaFour(currentPuzzle, selectedCell!)
     const relationalDelta4 = ProcedureBuilderHelper.buildRelationalDeltaFour(currentPuzzle, selectedCell!)
+    const fillInOnlyInDiagonal = ProcedureBuilderHelper.buildFillInOnlyInstanceInDiagonal(currentPuzzle, selectedCell!)
     return (
         <div>
             <header>Start Special Procedure:</header>
             <SpecialProceduresItem procedure={onlyOncePerDiagonal}/>
             <SpecialProceduresItem procedure={diagonalDelta4}/>
             <SpecialProceduresItem procedure={relationalDelta4}/>
+            <SpecialProceduresItem procedure={fillInOnlyInDiagonal}/>
         </div>
     );
 }
