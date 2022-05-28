@@ -102,17 +102,29 @@ function setUpBoard(): Board {
     const initialDiagonalWith1 = [72, 64, 56, 48, 40, 32, 24, 16, 8]
     const initialDiagonalWith2 = [74, 66, 58, 50, 42, 34, 26]
 
-    function checkOnlyOne(indexes: number[]) {
+    function checkOnlyOne(indexes: number[]): Procedure[] {
         return indexes.map(index => ProcedureBuilderHelper.buildOnlyOnceProcedure(board, index))
     }
-    function checkOncePerDiagonal(indexes: number[]) {
+    function checkOncePerDiagonal(indexes: number[]): Procedure[] {
         return indexes.map(index => ProcedureBuilderHelper.buildOnlyOncePerDiagonal(board, index))
     }
-    function checkDelta4Diagonal(indexes: number[]) {
+    function checkDelta4Diagonal(indexes: number[]): Procedure[] {
         return indexes.map(index => ProcedureBuilderHelper.buildPositiveDiagonalDeltaFour(board, index))
     }
-    function checkRelatedDelta4(indexes: number[]) {
+    function checkRelatedDelta4(indexes: number[]): Procedure[] {
         return indexes.map(index => ProcedureBuilderHelper.buildRelationalDeltaFour(board, index))
+    }
+    function fillInOnlyInDiagonal(index: number): Procedure[] {
+        return [ProcedureBuilderHelper.buildFillInOnlyInstanceInDiagonal(board, index)]
+    }
+    function fillInOnlyInRow(index: number): Procedure[] {
+        return [ProcedureBuilderHelper.buildFillInOnlyInstanceInRow(board, index)]
+    }
+    function fillInOnlyInColumn(index: number): Procedure[] {
+        return [ProcedureBuilderHelper.buildFillInOnlyInstanceInColumn(board, index)]
+    }
+    function fillInOnlyInSquare(index: number): Procedure[] {
+        return [ProcedureBuilderHelper.buildFillInOnlyInstanceInSquare(board, index)]
     }
 
     const procedures: Procedure[] = [
@@ -143,6 +155,32 @@ function setUpBoard(): Board {
         ...checkRelatedDelta4(square4.reverse()),
         // remove the sixes from the row with the 2 in it
         ...checkRelatedDelta4(diagonal11.reverse()),
+        // fill in a 6 in the top right corner
+        ...fillInOnlyInDiagonal(8),
+        // update related cells 
+        ...checkOnlyOne(square3),
+        ...checkOnlyOne(row1),
+        ...checkOnlyOne(column9),
+        // fill in a 6 in the top left corner of the bottom left square
+        ...fillInOnlyInSquare(54),
+        // update related cells
+        ...checkOnlyOne(square7),
+        ...checkOnlyOne(row7),
+        ...checkOnlyOne(column1),
+        ...checkOncePerDiagonal(diagonal7),
+        // fill in the 6 in the bottom middle box 
+        ...fillInOnlyInRow(66),
+        // update related cells
+        ...checkOnlyOne(square8),
+        ...checkOnlyOne(row8),
+        ...checkOnlyOne(column4),
+        ...checkOncePerDiagonal(diagonal11),
+        // update the diagonal for the delta rule 
+        ...checkDelta4Diagonal(diagonal11.reverse())
+        
+
+
+
 
         // testing stuff 
         // ...checkOnlyOne(allSquares),
