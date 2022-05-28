@@ -1,40 +1,79 @@
 import {
     RuleBuilderHelper,
-    DomClassHelper,
     ProcedureBuilderHelper,
-    Procedure,
-    Rule,
-    StepHelper
 } from "../procedures";
-import {BoardHelpers} from "../board";
+import {BoardHelpers, CellHelpers} from "../board";
 import {beginnerPuzzle1} from "../../../../puzzle-data/beginner-puzzles";
 
 
 function getBoard() {
-    return BoardHelpers.buildBoard(beginnerPuzzle1);
+    const board = BoardHelpers.buildBoard(beginnerPuzzle1)
+    board[4] = CellHelpers.addAllPencilMarksToCell(board[4])
+    return board;
 }
 
 
-function getProcedure() {
+function getPencilMarksProcedure() {
     const board = getBoard()
     return {
-        name: 'Add pencil marks',
+        name: 'Values occur once in each row, square or column',
         board: board,
         index: 4,
         rules: [
-            RuleBuilderHelper.buildAllValuesPossibleRule(board, 4),
-            RuleBuilderHelper.buildOnlyOncePerRule(board, 4),
+            RuleBuilderHelper.buildOnlyOncePerRule(4),
         ]
     }
 }
 
-describe('buildProcedure', () => {
+function getPositiveDiagonalDeltaFour() {
+    const board = getBoard()
+    return {
+        name: 'Miracle positive diagonal delta 4',
+        board: board,
+        index: 4,
+        rules: [
+            RuleBuilderHelper.buildPositiveDiagonalDeltaFour(4),
+        ]
+    }
+}
+
+function getOncePerDiagonal() {
+    const board = getBoard()
+    return {
+        name: 'Values occur once per diagonal',
+        board: board,
+        index: 4,
+        rules: [
+            RuleBuilderHelper.buildOnlyOncePerDiagonalRule(4),
+        ]
+    }
+}
+
+describe('buildOnlyOnceProcedure', () => {
     it('builds a pencil marks procedure', () => {
         const board = getBoard()
-        const procedure = ProcedureBuilderHelper.buildPencilMarksProcedure(board, 4);
-        expect(JSON.stringify(procedure)).toEqual(JSON.stringify(getProcedure()))
+        const procedure = ProcedureBuilderHelper.buildOnlyOnceProcedure(board, 4);
+        expect(JSON.stringify(procedure)).toEqual(JSON.stringify(getPencilMarksProcedure()))
     })
 })
+
+
+describe('buildPositiveDiagonalDeltaFour', () => {
+    it('builds a pencil marks procedure', () => {
+        const board = getBoard()
+        const procedure = ProcedureBuilderHelper.buildPositiveDiagonalDeltaFour(board, 4);
+        expect(JSON.stringify(procedure)).toEqual(JSON.stringify(getPositiveDiagonalDeltaFour()))
+    })
+})
+
+describe('buildOnlyOncePerDiagonal', () => {
+    it('builds a pencil marks procedure', () => {
+        const board = getBoard()
+        const procedure = ProcedureBuilderHelper.buildOnlyOncePerDiagonal(board, 4);
+        expect(JSON.stringify(procedure)).toEqual(JSON.stringify(getOncePerDiagonal()))
+    })
+})
+
 
 //  0  1  2   3  4  5   6  7  8
 //  9 10 11  12 13 14  15 16 17

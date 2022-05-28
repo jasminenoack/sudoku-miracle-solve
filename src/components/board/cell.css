@@ -115,6 +115,11 @@
     color: black;
 }
 
+.cell.scanning {
+    background: lime;
+    color: black;
+}
+
 .cell.processing-cell {
     background: purple;
     color: white;

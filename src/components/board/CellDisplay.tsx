@@ -37,13 +37,9 @@ export function CellDisplay ({cell, index}: PropTypes) {
     if (selected) {
         classes.push('selected')
     }
-    console.log(index, "classes", classes)
-    console.log(runningProcedure)
     if (runningProcedure) {
         const currentStep = ProcedureHelper.getCurrentStep(runningProcedure)
         if (currentStep) {
-            console.log(StepHelper.getClassesByIndex(currentStep.domClasses))
-            console.log(selectedCell)
             const newClasses = StepHelper.getClassesByIndex(currentStep.domClasses)[index]
             if (newClasses) {
                 classes = classes.concat(newClasses)

@@ -21,7 +21,7 @@ export interface Cell {
 export type Board = Cell[]
 
 export class CellHelpers {
-    static buildPencilMarks(status: PencilMarkValue = 'not_present'): PencilMarks {
+    static buildPencilMarks(status: PencilMarkValue = 'valid'): PencilMarks {
         return {
             1: status,
             2: status,
@@ -90,8 +90,18 @@ export class CellHelpers {
 
     static removeAllPencilMarksFromCell(cell: Cell): Cell {
         const newCell = CellHelpers.copyCell(cell);
-        newCell.pencilMarks = CellHelpers.buildPencilMarks()
+        newCell.pencilMarks = CellHelpers.buildPencilMarks('not_present')
         return newCell;
+    }
+
+    static getCurrentPencilMarks(cell: Cell): number[] {
+        return [1, 2, 3, 4, 5, 6, 7, 8, 9].filter(
+            value => cell.pencilMarks[value] == 'valid'
+        )
+    }
+
+    static isStarted(cell: Cell) {
+        return cell.value !== undefined || CellHelpers.getCurrentPencilMarks(cell).length
     }
 }
 
@@ -133,5 +143,37 @@ export class BoardHelpers {
 
     static getValuesForIndexes(board: Board, indexes: number[]): number[] {
         return indexes.map(index => board[index].value).filter(value => value).sort() as number[]
+    }
+
+    static getIndexesForAdjacentPositiveDiagonals(index: number): number[] {
+        const inFirstColumn = index / 9 === Math.floor(index / 9)
+        const inLastColumn = (index + 1) / 9 === Math.floor((index + 1) / 9)
+        const inFirstRow = index < 9
+        const inLastRow = index >= 72
+
+        const indexes = []
+        if (!inFirstRow && !inLastColumn) {
+            indexes.push(index - 8)
+        }
+
+        if (!inLastRow && !inFirstColumn) {
+            indexes.push(index + 8)
+        }
+        return indexes
+    }
+
+    static getIndexesForPositiveDiagonals(index: number): number[] {
+        let indexes: number[] = [index];
+        let indexesToProcess: number[] = [index];
+
+        while (indexesToProcess.length) {
+            const newIndex = indexesToProcess.pop()
+            const diagonalAdjacent = BoardHelpers.getIndexesForAdjacentPositiveDiagonals(newIndex!)
+            const newNumbers = diagonalAdjacent.filter(newIndex => indexes.indexOf(newIndex) === -1)
+            indexesToProcess = indexesToProcess.concat(newNumbers)
+            indexes = indexes.concat(newNumbers)
+        }
+
+        return indexes.sort()
     }
 }

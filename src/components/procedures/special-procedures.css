@@ -1,0 +1,22 @@
+.special-procedures {
+    position: absolute;
+    left: calc(50vw + 300px);
+    top: 70px;
+    padding: 10px;
+    height: 300px;
+    width: 300px;
+    background: dodgerblue;
+}
+
+.special-procedures header {
+    font-size: 1.5em;
+}
+
+.special-procedures button {
+    margin: 10px;
+}
+
+
+.special-procedures button:disabled {
+    color: gray;
+}

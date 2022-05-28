@@ -1,4 +1,5 @@
 import {Board, BoardHelpers, CellHelpers} from "./board";
+import React from "react";
 
 export interface DomClass {
     className: string,
@@ -6,7 +7,7 @@ export interface DomClass {
     indexes: {[key: number]: boolean},
 }
 
-type updateForStepFunction = (step: Step) => {newBoard: Board, newStep: Step}
+type updateForStepFunction = (step: Step, board: Board) => {newBoard: Board, newStep: Step}
 
 export interface Step {
     name: string,
@@ -43,6 +44,7 @@ export interface Procedure {
     index: number,
     name: string,
     rules: Rule[],
+    disabled?: boolean,
 }
 
 export interface OptionalProcedure {
@@ -102,7 +104,7 @@ export class StepHelper {
         if (step.inProgress) {
             let newStep: Step, newBoard: Board;
             if (step.completeStep) {
-                const results = step.completeStep(step)
+                const results = step.completeStep(step, board)
                 newBoard = results.newBoard
                 newStep = results.newStep
             } else {
@@ -114,7 +116,7 @@ export class StepHelper {
                 newBoard,
             }
         } else {
-            const {newStep, newBoard} = step.updateForStep(step)
+            const {newStep, newBoard} = step.updateForStep(step, board)
             return {
                 newStep: StepHelper.updateStep({inProgress: true}, newStep),
                 newBoard,
@@ -178,8 +180,8 @@ export class ProcedureHelper {
             throw 'cannot call without rule'
         }
         const ruleIndex = procedure.rules.indexOf(rule)
-        const newProcedure = ProcedureHelper.updateProcedure({}, procedure)
         const {newRule, newBoard} = RuleHelper.incrementRule(rule, board)
+        const newProcedure = ProcedureHelper.updateProcedure({board: newBoard}, procedure)
         newProcedure.rules[ruleIndex] = newRule
         return {newBoard, newProcedure}
     }
@@ -189,8 +191,8 @@ export class StepBuilderHelper {
     static processingClassName: string = 'processing-cell'
     static scanningClassName: string = 'scanning'
 
-    static buildAddAllValuesStep(board: Board, index: number) {
-        function buildProcessing(step: Step): {newBoard: Board, newStep: Step} {
+    static buildAddAllValuesStep(index: number) {
+        function buildProcessing(step: Step, board: Board): {newBoard: Board, newStep: Step} {
             const newStep = StepHelper.updateStep(
                 {descriptionOfChange: 'Adds all possible values to the cell'},
                 step,
@@ -217,8 +219,8 @@ export class StepBuilderHelper {
         )
     }
 
-    static _buildOncePerStep(board: Board, index: number, indexes: number[], type: string): Step {
-        function processingFunction(step: Step): {newBoard: Board, newStep: Step} {
+    static _buildOncePerStep(index: number, indexes: number[], type: string): Step {
+        function processingFunction(step: Step, board: Board): {newBoard: Board, newStep: Step} {
             const indexes = step.domClasses[1].indexes
             const values = BoardHelpers.getValuesForIndexes(board, Object.keys(indexes).map(num => +num))
             const cell = board[index]
@@ -237,7 +239,7 @@ export class StepBuilderHelper {
             }
         }
 
-        function completeFunction(step: Step): {newBoard: Board, newStep: Step} {
+        function completeStep(step: Step, board: Board): {newBoard: Board, newStep: Step} {
             const cell = board[index]
             const newCell = CellHelpers.removeInvalidPencilMarksFromCell(cell)
             const newBoard = BoardHelpers.replaceCells(
@@ -262,56 +264,198 @@ export class StepBuilderHelper {
                 ),
             ],
             processingFunction,
-            completeFunction,
+            completeStep,
         )
     }
 
-    static buildOncePerColumnStep(board: Board, index: number): Step {
-        return StepBuilderHelper._buildOncePerStep(board, index, BoardHelpers.getIndexesForColumnContaining(index), 'column')
+    static buildOncePerColumnStep(index: number): Step {
+        return StepBuilderHelper._buildOncePerStep(index, BoardHelpers.getIndexesForColumnContaining(index), 'column')
     }
 
-    static buildOncePerRowStep(board: Board, index: number): Step {
-        return StepBuilderHelper._buildOncePerStep(board, index, BoardHelpers.getIndexesForRowContaining(index), 'row')
+    static buildOncePerRowStep(index: number): Step {
+        return StepBuilderHelper._buildOncePerStep(index, BoardHelpers.getIndexesForRowContaining(index), 'row')
     }
 
-    static buildOncePerSquareStep(board: Board, index: number): Step {
-        return StepBuilderHelper._buildOncePerStep(board, index, BoardHelpers.getIndexesForSquareContaining(index), 'square')
+    static buildOncePerSquareStep(index: number): Step {
+        return StepBuilderHelper._buildOncePerStep(index, BoardHelpers.getIndexesForSquareContaining(index), 'square')
+    }
+
+    static buildOnlyOncePerDiagonal(index: number): Step {
+         return StepBuilderHelper._buildOncePerStep(index, BoardHelpers.getIndexesForPositiveDiagonals(index), 'diagonal')
+    }
+
+    static buildPositiveDiagonalDeltaFour(index: number): Step {
+        function _valuesFourFromValues(valuesSets: number[][]) {
+            let allowedValues: number[] = [1, 2, 3, 4, 5, 6, 7, 8, 9]
+
+            function onlyUnique(value: number, index: number, self: number[]) {
+                return self.indexOf(value) === index;
+            }
+
+            valuesSets.forEach(valueSet => {
+                let setAllowableValues: number[] = []
+                valueSet.forEach(value => {
+                    const newAllowableValues = [1, 2, 3, 4, 5, 6, 7, 8, 9].filter(
+                        newValue => newValue < value - 3 || newValue > value + 3
+                    )
+                    setAllowableValues = setAllowableValues.concat(newAllowableValues).filter(onlyUnique)
+                })
+                allowedValues = allowedValues.filter(value => setAllowableValues.indexOf(value) != -1)
+            })
+
+            return allowedValues
+        }
+        function processingFunction(step: Step, board: Board): {newBoard: Board, newStep: Step} {
+            const indexes = BoardHelpers.getIndexesForAdjacentPositiveDiagonals(index)
+            let valueSets = indexes.map(index => board[index].value ? [board[index].value!] : CellHelpers.getCurrentPencilMarks(board[index]))
+            valueSets = valueSets.filter(valueSet => valueSet.length)
+            const allowedValues = _valuesFourFromValues(valueSets)
+            let unAllowedValues;
+            if (!allowedValues) {
+                unAllowedValues = []
+            } {
+                unAllowedValues = [1, 2, 3, 4, 5, 6, 7, 8, 9].filter(value => allowedValues.indexOf(value) === -1)
+            }
+            const cell = board[index]
+            const newCell = CellHelpers.makePencilMarksInvalid(unAllowedValues, cell)
+            const newStep = StepHelper.updateStep(
+                {descriptionOfChange: `Marking values in diagonal (${unAllowedValues.join(', ')}) as invalid`},
+                step,
+            )
+            const newBoard = BoardHelpers.replaceCells(
+                board,
+                [{index, newCell}]
+            )
+            return {
+                newStep,
+                newBoard,
+            }
+        }
+
+        function completeStep(step: Step, board: Board): {newBoard: Board, newStep: Step} {
+            const cell = board[index]
+            const newCell = CellHelpers.removeInvalidPencilMarksFromCell(cell)
+            const newBoard = BoardHelpers.replaceCells(
+                board,
+                [{index, newCell}]
+            )
+            return {
+                newBoard,
+                newStep: step,
+            }
+        }
+        const indexes = BoardHelpers.getIndexesForAdjacentPositiveDiagonals(index)
+        return StepHelper.buildStep(
+            'Consecutive numbers in a positive decimal must have a delta of at least 4',
+            [
+                DomClassHelper.buildDomClass(
+                    StepBuilderHelper.processingClassName,
+                    [index],
+                ),
+                DomClassHelper.buildDomClass(
+                    StepBuilderHelper.scanningClassName,
+                    indexes,
+                ),
+            ],
+            processingFunction,
+            completeStep,
+        )
     }
 }
 
 export class RuleBuilderHelper {
-    static buildAllValuesPossibleRule (board: Board, index: number) {
+    static buildAllValuesPossibleRule (index: number) {
         return {
             name: 'All values can be made',
             steps: [
-                StepBuilderHelper.buildAddAllValuesStep(board, index)
+                StepBuilderHelper.buildAddAllValuesStep(index)
             ]
         }
     }
 
-    static buildOnlyOncePerRule(board: Board, index: number): Rule {
+    static buildOnlyOncePerRule(index: number): Rule {
         return {
             name: 'Values only occur once in a column, row, or square',
             steps: [
-                StepBuilderHelper.buildOncePerSquareStep(board, index),
-                StepBuilderHelper.buildOncePerRowStep(board, index),
-                StepBuilderHelper.buildOncePerColumnStep(board, index)
+                StepBuilderHelper.buildOncePerSquareStep(index),
+                StepBuilderHelper.buildOncePerRowStep(index),
+                StepBuilderHelper.buildOncePerColumnStep(index)
+            ]
+        }
+    }
+
+    static buildOnlyOncePerDiagonalRule(index: number): Rule {
+        return {
+            name: 'Values only occur once in a column, row, or square',
+            steps: [
+                StepBuilderHelper.buildOnlyOncePerDiagonal(index),
+            ]
+        }
+    }
+
+    static buildPositiveDiagonalDeltaFour(index: number): Rule {
+        return {
+            name: 'Values adjacent in positive diagonals must be 4 greater than or equal to the next number',
+            steps: [
+                StepBuilderHelper.buildPositiveDiagonalDeltaFour(index)
             ]
         }
     }
 }
 
 export class ProcedureBuilderHelper {
-    static buildPencilMarksProcedure (board: Board, index: number) {
-        return {
-            name: 'Add pencil marks',
-            board: board,
-            index: index,
-            rules: [
-                RuleBuilderHelper.buildAllValuesPossibleRule(board, index),
-                RuleBuilderHelper.buildOnlyOncePerRule(board, index),
-            ]
+    static _buildProcedureForEmptyMarkedCell(
+        board: Board,
+        index: number | undefined,
+        text: string,
+        ruleBuilders: ((index: number) => Rule)[]
+    ): Procedure  {
+        let disabled = false;
+        if (!index || board[index].value) {
+            disabled = true
         }
+        if (disabled) {
+            return {
+                name: text,
+                board: board,
+                index: 0,
+                rules: [],
+                disabled: true,
+            }
+        }
+        return {
+            name: text,
+            board: board,
+            index: index!,
+            rules: ruleBuilders.map(ruleBuilder => ruleBuilder(index!)),
+        }
+    }
+
+    static buildOnlyOnceProcedure (board: Board, index: number | undefined): Procedure {
+        return ProcedureBuilderHelper._buildProcedureForEmptyMarkedCell(
+            board,
+            index,
+            'Values occur once in each row, square or column',
+            [RuleBuilderHelper.buildOnlyOncePerRule]
+        )
+    }
+
+    static buildOnlyOncePerDiagonal (board: Board, index: number): Procedure {
+        return ProcedureBuilderHelper._buildProcedureForEmptyMarkedCell(
+            board,
+            index,
+            'Values occur once per diagonal',
+            [RuleBuilderHelper.buildOnlyOncePerDiagonalRule]
+        )
+    }
+
+    static buildPositiveDiagonalDeltaFour(board: Board, index: number): Procedure {
+        return ProcedureBuilderHelper._buildProcedureForEmptyMarkedCell(
+            board,
+            index,
+            'Miracle positive diagonal delta 4',
+            [RuleBuilderHelper.buildPositiveDiagonalDeltaFour]
+        )
     }
 }
 

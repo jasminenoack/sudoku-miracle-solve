@@ -7,25 +7,30 @@ function getBoard() {
 }
 
 function getAllValuesRule (): Rule {
-    const board = getBoard()
-
     return {
         name: 'All values can be made',
         steps: [
-            StepBuilderHelper.buildAddAllValuesStep(board, 4)
+            StepBuilderHelper.buildAddAllValuesStep(4)
         ]
     }
 }
 
 function getOnlyOneRule (): Rule {
-    const board = getBoard()
-
     return {
         name: 'Values only occur once in a column, row, or square',
         steps: [
-            StepBuilderHelper.buildOncePerSquareStep(board, 4),
-            StepBuilderHelper.buildOncePerRowStep(board, 4),
-            StepBuilderHelper.buildOncePerColumnStep(board, 4)
+            StepBuilderHelper.buildOncePerSquareStep(4),
+            StepBuilderHelper.buildOncePerRowStep(4),
+            StepBuilderHelper.buildOncePerColumnStep(4)
+        ]
+    }
+}
+
+function getPositiveDiagonalDeltaFour() {
+    return {
+        name: 'Values adjacent in positive diagonals must be 4 greater than or equal to the next number',
+        steps: [
+            StepBuilderHelper.buildPositiveDiagonalDeltaFour(4),
         ]
     }
 }
@@ -33,13 +38,19 @@ function getOnlyOneRule (): Rule {
 describe('buildAllValuesPossibleRule', () => {
     it('build rule', () => {
         const board = getBoard()
-        const rule = RuleBuilderHelper.buildAllValuesPossibleRule(board, 4)
+        const rule = RuleBuilderHelper.buildAllValuesPossibleRule(4)
         expect(JSON.stringify(rule)).toEqual(JSON.stringify(getAllValuesRule()))
     })
 })
 
 describe('buildOnlyOncePerRule', () => {
     const board = getBoard();
-    const rule = RuleBuilderHelper.buildOnlyOncePerRule(board, 4);
+    const rule = RuleBuilderHelper.buildOnlyOncePerRule(4);
     expect(JSON.stringify(rule)).toEqual(JSON.stringify(getOnlyOneRule()))
+})
+
+describe('getPositiveDiagonalDeltaFour', () => {
+    const board = getBoard();
+    const rule = RuleBuilderHelper.buildPositiveDiagonalDeltaFour(4);
+    expect(JSON.stringify(rule)).toEqual(JSON.stringify(getPositiveDiagonalDeltaFour()))
 })

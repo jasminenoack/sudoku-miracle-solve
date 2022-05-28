@@ -1,17 +1,17 @@
 import React, {useContext} from 'react'
 import {BoardContext} from "../context/BoardContext";
 import {Procedure, ProcedureBuilderHelper, ProcedureHelper, Rule, RuleHelper, Step} from "../context/models/procedures";
-import './procedures.css'
+import './special-procedures.css'
 
 
-function ProceduresItem (
+function SpecialProceduresItem (
     {
         procedure,
     } : {
         procedure: Procedure,
     }
 ) {
-    const {selectedCell, currentPuzzle, setRunningProcedure} = useContext(BoardContext);
+    const {selectedCell, currentPuzzle, setRunningSpecialProcedure} = useContext(BoardContext);
     const text = procedure.name
     if (!selectedCell || currentPuzzle[selectedCell].value) {
         return <button disabled>{text}</button>
@@ -21,22 +21,23 @@ function ProceduresItem (
         return <button disabled>{text}</button>
     }
     function chooseProcedure() {
-        setRunningProcedure(procedure)
+        setRunningSpecialProcedure(procedure)
     }
     return <button onClick={chooseProcedure}>{text}</button>
 }
 
-
-export function StartProceduresMenu () {
+function StartProceduresMenu () {
     const {selectedCell, currentPuzzle} = useContext(BoardContext);
-    const onlyOnce = ProcedureBuilderHelper.buildOnlyOnceProcedure(currentPuzzle, selectedCell!)
 
+    const onlyOncePerDiagonal = ProcedureBuilderHelper.buildOnlyOncePerDiagonal(currentPuzzle, selectedCell!)
+    const diagonalDelta4 = ProcedureBuilderHelper.buildPositiveDiagonalDeltaFour(currentPuzzle, selectedCell!)
     return (
         <div>
-            <header>Start Procedure:</header>
-            <ProceduresItem procedure={onlyOnce}/>
+            <header>Start Special Procedure:</header>
+            <SpecialProceduresItem procedure={onlyOncePerDiagonal}/>
+            <SpecialProceduresItem procedure={diagonalDelta4}/>
         </div>
-    )
+    );
 }
 
 
@@ -47,11 +48,11 @@ function RunStep (
         step: Step
     }
 ) {
-    const {runningProcedure, currentPuzzle, setRunningProcedure, setCurrentPuzzle} = useContext(BoardContext);
+    const {runningSpecialProcedure, currentPuzzle, setRunningSpecialProcedure, setCurrentPuzzle} = useContext(BoardContext);
 
     function runStep() {
-        const {newProcedure, newBoard} = ProcedureHelper.incrementProcedure(runningProcedure!, currentPuzzle)
-        setRunningProcedure(newProcedure)
+        const {newProcedure, newBoard} = ProcedureHelper.incrementProcedure(runningSpecialProcedure!, currentPuzzle)
+        setRunningSpecialProcedure(newProcedure)
         setCurrentPuzzle(newBoard)
     }
     return (
@@ -68,10 +69,10 @@ function CompleteStep (
         step: Step
     }
 ) {
-    const {runningProcedure, currentPuzzle, setRunningProcedure, setCurrentPuzzle} = useContext(BoardContext);
+    const {runningSpecialProcedure, currentPuzzle, setRunningSpecialProcedure, setCurrentPuzzle} = useContext(BoardContext);
     function completeStep() {
-        const {newProcedure, newBoard} = ProcedureHelper.incrementProcedure(runningProcedure!, currentPuzzle)
-        setRunningProcedure(newProcedure)
+        const {newProcedure, newBoard} = ProcedureHelper.incrementProcedure(runningSpecialProcedure!, currentPuzzle)
+        setRunningSpecialProcedure(newProcedure)
         setCurrentPuzzle(newBoard)
     }
     return (
@@ -83,9 +84,9 @@ function CompleteStep (
 }
 
 function CompleteProcedure () {
-    const {setRunningProcedure} = useContext(BoardContext);
+    const {setRunningSpecialProcedure} = useContext(BoardContext);
     function completeProcedure() {
-        setRunningProcedure(undefined);
+        setRunningSpecialProcedure(undefined);
     }
     return (
         <div>
@@ -107,12 +108,12 @@ function RuleDisplay({rule}: {rule: Rule}) {
 
 function RunningProcedure(
     {
-        runningProcedure
+        runningSpecialProcedure
     }: {
-        runningProcedure: Procedure
+        runningSpecialProcedure: Procedure
     }
 ) {
-    const rule = ProcedureHelper.getCurrentRule(runningProcedure)
+    const rule = ProcedureHelper.getCurrentRule(runningSpecialProcedure)
     let inner;
     if (rule) {
         inner = <RuleDisplay rule={rule}/>
@@ -122,24 +123,24 @@ function RunningProcedure(
 
     return (
         <>
-            <header>Running: {runningProcedure.name}</header>
+            <header>Running: {runningSpecialProcedure.name}</header>
             {inner}
         </>
     )
 }
 
-export function ProcedureDisplay() {
-    const {runningProcedure} = useContext(BoardContext);
+export function SpecialProcedureDisplay() {
+    const {runningSpecialProcedure} = useContext(BoardContext);
 
     function getInner() {
-        if (runningProcedure) {
-            return <RunningProcedure runningProcedure={runningProcedure}/>
+        if (runningSpecialProcedure) {
+            return <RunningProcedure runningSpecialProcedure={runningSpecialProcedure}/>
         } else {
             return <StartProceduresMenu/>
         }
     }
     return (
-        <div className='procedures'>
+        <div className='special-procedures'>
             {getInner()}
         </div>
     )

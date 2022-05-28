@@ -24,8 +24,8 @@ function cellWithPencilMarks(): Cell {
 }
 
 describe('buildPencilMarks', () => {
-    it('should build pencil marks', () => {
-        expect(CellHelpers.buildPencilMarks()).toEqual({
+    it('should build pencil marks with status', () => {
+        expect(CellHelpers.buildPencilMarks('not_present')).toEqual({
             1: 'not_present',
             2: 'not_present',
             3: 'not_present',
@@ -38,8 +38,8 @@ describe('buildPencilMarks', () => {
         })
     })
 
-    it("should set a value if sent one", () => {
-        expect(CellHelpers.buildPencilMarks('valid')).toEqual({
+    it("buidl pencil marks", () => {
+        expect(CellHelpers.buildPencilMarks()).toEqual({
             1: 'valid',
             2: 'valid',
             3: 'valid',
@@ -84,7 +84,8 @@ describe('copyCell', () => {
 
 describe('addPencilMarksToCell', () => {
     it('should add pencil marks where there are none', () => {
-        const cell = cellWithValue();
+        let cell = cellWithValue();
+        cell = CellHelpers.removeAllPencilMarksFromCell(cell);
         const newCell = CellHelpers.addPencilMarksToCell([1, 2, 5, 6], cell)
         expect(newCell.pencilMarks).toEqual({
             1: 'valid',
@@ -100,7 +101,7 @@ describe('addPencilMarksToCell', () => {
     });
 
     it('should add additional pencil marks if there are some', () => {
-        const cell = cellWithPencilMarks();
+        let cell = cellWithPencilMarks();
         const newCell = CellHelpers.addPencilMarksToCell([5, 9], cell)
         expect(newCell.pencilMarks).toEqual({
             1: 'valid',
@@ -233,5 +234,43 @@ describe('removeInvalidPencilMarksFromCell', () => {
             8: 'not_present',
             9: 'not_present',
         })
+    })
+})
+
+
+describe('getCurrentPencilMarks', () => {
+    it('should give the values that are set to valid', () => {
+        const cell = cellWithoutValue()
+        cell.pencilMarks = {
+            1: 'invalid',
+            2: 'invalid',
+            3: 'valid',
+            4: 'invalid',
+            5: 'valid',
+            6: 'not_present',
+            7: 'invalid',
+            8: 'not_present',
+            9: 'valid',
+        }
+        expect(CellHelpers.getCurrentPencilMarks(cell)).toEqual([3, 5, 9])
+    })
+})
+
+describe('isStarted', () => {
+    it('is true if has value', () => {
+        let cell = cellWithValue()
+        cell = CellHelpers.removeAllPencilMarksFromCell(cell);
+        expect(CellHelpers.isStarted(cell)).toBeTruthy()
+    })
+
+    it('is true if has pencil marks', () => {
+        const cell = cellWithPencilMarks()
+        expect(CellHelpers.isStarted(cell)).toBeTruthy()
+    })
+
+    it('is false if has neither', () => {
+        let cell = cellWithoutValue()
+        cell = CellHelpers.removeAllPencilMarksFromCell(cell);
+        expect(CellHelpers.isStarted(cell)).toBeFalsy()
     })
 })

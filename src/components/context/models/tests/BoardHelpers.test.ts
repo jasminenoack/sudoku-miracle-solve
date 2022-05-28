@@ -243,6 +243,118 @@ describe('getValuesForIndexes', () => {
     });
 })
 
+describe('getIndexesForAdjacentPositiveDiagonals', () => {
+    it('should work for top left corner', () => {
+        expect(
+            BoardHelpers.getIndexesForAdjacentPositiveDiagonals(0)
+        ).toEqual([])
+    })
+
+    it('should work for top middle corner', () => {
+        expect(
+            BoardHelpers.getIndexesForAdjacentPositiveDiagonals(4)
+        ).toEqual([12])
+    })
+
+    it('should work for top right corner', () => {
+        expect(
+            BoardHelpers.getIndexesForAdjacentPositiveDiagonals(8)
+        ).toEqual([16])
+    })
+
+    it('should work for middle left corner', () => {
+        expect(
+            BoardHelpers.getIndexesForAdjacentPositiveDiagonals(36)
+        ).toEqual([28])
+    })
+
+    it('should work for middle middle corner', () => {
+        expect(
+            BoardHelpers.getIndexesForAdjacentPositiveDiagonals(40)
+        ).toEqual([32, 48])
+    })
+
+    it('should work for middle right corner', () => {
+        expect(
+            BoardHelpers.getIndexesForAdjacentPositiveDiagonals(35)
+        ).toEqual([43])
+    })
+
+    it('should work for bottom left corner', () => {
+        expect(
+            BoardHelpers.getIndexesForAdjacentPositiveDiagonals(72)
+        ).toEqual([64])
+    })
+
+    it('should work for bottom middle corner', () => {
+        expect(
+            BoardHelpers.getIndexesForAdjacentPositiveDiagonals(75)
+        ).toEqual([67])
+    })
+
+    it('should work for bottom right corner', () => {
+        expect(
+            BoardHelpers.getIndexesForAdjacentPositiveDiagonals(80)
+        ).toEqual([])
+    })
+})
+
+describe('getIndexesForPositiveDiagonals', () => {
+    it('should work for top left corner', () => {
+        expect(
+            BoardHelpers.getIndexesForPositiveDiagonals(0)
+        ).toEqual([0])
+    })
+
+    it('should work for top middle corner', () => {
+        expect(
+            BoardHelpers.getIndexesForPositiveDiagonals(4)
+        ).toEqual([12, 20, 28, 36, 4])
+    })
+
+    it('should work for top right corner', () => {
+        expect(
+            BoardHelpers.getIndexesForPositiveDiagonals(8)
+        ).toEqual([16, 24, 32, 40, 48, 56, 64, 72, 8])
+    })
+
+    it('should work for middle left corner', () => {
+        expect(
+            BoardHelpers.getIndexesForPositiveDiagonals(36)
+        ).toEqual([12, 20, 28, 36, 4])
+    })
+
+    it('should work for middle middle corner', () => {
+        expect(
+            BoardHelpers.getIndexesForPositiveDiagonals(40)
+        ).toEqual([16, 24, 32, 40, 48, 56, 64, 72, 8])
+    })
+
+    it('should work for middle right corner', () => {
+        expect(
+            BoardHelpers.getIndexesForPositiveDiagonals(35)
+        ).toEqual([35, 43, 51, 59, 67, 75])
+    })
+
+    it('should work for bottom left corner', () => {
+        expect(
+            BoardHelpers.getIndexesForPositiveDiagonals(72)
+        ).toEqual([16, 24, 32, 40, 48, 56, 64, 72, 8])
+    })
+
+    it('should work for bottom middle corner', () => {
+        expect(
+            BoardHelpers.getIndexesForPositiveDiagonals(75)
+        ).toEqual([35, 43, 51, 59, 67, 75])
+    })
+
+    it('should work for bottom right corner', () => {
+        expect(
+            BoardHelpers.getIndexesForPositiveDiagonals(80)
+        ).toEqual([80])
+    })
+})
+
 //  0  1  2   3  4  5   6  7  8
 //  9 10 11  12 13 14  15 16 17
 // 18 19 20  21 22 23  24 25 26
