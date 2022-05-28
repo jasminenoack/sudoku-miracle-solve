@@ -1,6 +1,6 @@
 import React, {useContext} from 'react'
 import {CellDisplay} from "./CellDisplay";
-import './board.css'
+import './board.scss'
 import {BoardContext} from "../context/BoardContext";
 
 

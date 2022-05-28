@@ -6,17 +6,15 @@
     height: 300px;
     width: 300px;
     background: purple;
+    header {
+        font-size: 1.5em;
+    }
+
+    button {
+        margin: 10px;
+        &:disabled {
+            color: gray;
+        }
+    }
 }
 
-.procedures header {
-    font-size: 1.5em;
-}
-
-.procedures button {
-    margin: 10px;
-}
-
-
-.procedures button:disabled {
-    color: gray;
-}

@@ -1,7 +1,7 @@
 import React, {useContext} from 'react'
 import {BoardContext} from "../context/BoardContext";
 import {Procedure, ProcedureBuilderHelper, ProcedureHelper, Rule, RuleHelper, Step} from "../context/models/procedures";
-import './special-procedures.css'
+import './special-procedures.scss'
 
 
 function SpecialProceduresItem (

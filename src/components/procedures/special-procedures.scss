@@ -6,17 +6,16 @@
     height: 300px;
     width: 300px;
     background: dodgerblue;
+    header {
+        font-size: 1.5em;
+    }
+
+    button {
+        margin: 10px;
+
+        &:disabled {
+            color: gray;
+        }
+    }
 }
 
-.special-procedures header {
-    font-size: 1.5em;
-}
-
-.special-procedures button {
-    margin: 10px;
-}
-
-
-.special-procedures button:disabled {
-    color: gray;
-}

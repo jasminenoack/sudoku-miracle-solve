@@ -1,6 +1,6 @@
 import {useContext} from "react";
 import {BoardContext} from "../context/BoardContext";
-import './number-selector.css'
+import './number-selector.scss'
 
 function NumberSelection({value}: {value: number}) {
     const {selectedValues, setSelectedValues} = useContext(BoardContext)

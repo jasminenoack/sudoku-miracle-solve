@@ -1,5 +1,5 @@
 import React from 'react';
-import './App.css';
+import './App.scss';
 import {BoardDisplay} from './components/board/BoardDisplay'
 import {BoardContextProvider} from "./components/context/BoardContext";
 import {ProcedureDisplay} from "./components/procedures/Procedures";

@@ -1,5 +1,5 @@
 import React, {useContext} from 'react'
-import './cell.css'
+import './cell.scss'
 import {Cell, CellHelpers} from "../context/models/board";
 import {BoardContext} from "../context/BoardContext";
 import {ProcedureHelper, StepHelper} from "../context/models/procedures";
