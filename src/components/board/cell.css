@@ -173,3 +173,7 @@
     color: red;
     text-decoration: line-through;
 }
+
+.pencil-mark.not_present {
+    display: none;
+}

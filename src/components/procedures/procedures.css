@@ -1,0 +1,22 @@
+.procedures {
+    position: absolute;
+    right: calc(50vw + 300px);
+    top: 70px;
+    padding: 10px;
+    height: 300px;
+    width: 300px;
+    background: purple;
+}
+
+.procedures header {
+    font-size: 1.5em;
+}
+
+.procedures button {
+    margin: 10px;
+}
+
+
+.procedures button:disabled {
+    color: gray;
+}

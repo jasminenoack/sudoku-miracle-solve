@@ -1,10 +1,10 @@
 import {NumbersAppearOnceInEachColumn} from '../NumbersAppearOnceInEachColumn';
-import {BoardRepresentation} from "../../../board/models/BoardRepresentation";
 import {beginnerPuzzle1} from "../../../../puzzle-data/beginner-puzzles";
+import {BoardHelpers} from "../../../context/models/board";
 
 
 function buildRule() {
-    const board = new BoardRepresentation(beginnerPuzzle1)
+    const board = BoardHelpers.buildBoard(beginnerPuzzle1)
     return new NumbersAppearOnceInEachColumn(15, board)
 }
 

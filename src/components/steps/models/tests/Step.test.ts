@@ -52,7 +52,8 @@ describe('Step', () => {
         it('marks the step as complete', () => {
             const step = buildStep()
             step.runStep()
-            expect(step.isComplete).toBeTruthy()
+            expect(step.inProgress).toBeTruthy()
+            expect(step.isComplete).toBeFalsy()
         })
     })
 })

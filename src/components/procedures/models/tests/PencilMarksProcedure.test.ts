@@ -1,9 +1,9 @@
 import {PencilMarksProcedure} from "../PencilMarksProcedure";
-import {BoardRepresentation} from "../../../board/models/BoardRepresentation";
 import {beginnerPuzzle1} from "../../../../puzzle-data/beginner-puzzles";
+import {BoardHelpers} from "../../../context/models/board";
 
 function buildPencilMarks() {
-    const board = new BoardRepresentation(beginnerPuzzle1)
+    const board = BoardHelpers.buildBoard(beginnerPuzzle1)
     return new PencilMarksProcedure(board, 4)
 }
 
@@ -13,21 +13,37 @@ describe('PencilMarksProcedure', () => {
             const pencilMarks = buildPencilMarks()
             const board = pencilMarks.board
             pencilMarks.runNext()
-            const cell = board.cells[4]
-            const values = cell.getPencilValues()
-            expect(values).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9])
+            const cell = board[4]
+            const values = Object.keys(cell.pencilMarks)
+            expect(values).toEqual(['1', '2', '3', '4', '5', '6', '7', '8', '9'])
         })
 
-        it('it registers as complete after final step', () => {
+        it('it registers as complete after final step complete', () => {
             const pencilMarks = buildPencilMarks()
             pencilMarks.runNext()
+            pencilMarks.completeStep()
             expect(pencilMarks.isComplete()).toBeTruthy()
         })
     })
 
-    describe('canRunProcedure', () => {
-        const pencilMarks = buildPencilMarks()
-        expect(pencilMarks.canRunProcedure()).toBeTruthy();
+    describe('canRunProcedure',() => {
+        it('can run if selected cell is empaty', () => {
+            const pencilMarks = buildPencilMarks()
+            const board = pencilMarks.board
+            expect(PencilMarksProcedure.canRunProcedure(3, board)).toBeTruthy();
+        })
+
+        it('cannot run if no selected cell', () => {
+            const pencilMarks = buildPencilMarks()
+            const board = pencilMarks.board
+            expect(PencilMarksProcedure.canRunProcedure(undefined, board)).toBeFalsy();
+        })
+
+        it('cannot run if selected cell has value', () => {
+            const pencilMarks = buildPencilMarks()
+            const board = pencilMarks.board
+            expect(PencilMarksProcedure.canRunProcedure(1, board)).toBeFalsy();
+        })
     })
 })
 

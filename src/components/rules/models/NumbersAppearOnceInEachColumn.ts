@@ -1,6 +1,5 @@
-import {BoardRepresentation} from "../../board/models/BoardRepresentation";
-import {CellRepresentation} from "../../board/models/CellRepresentation";
 import {Step} from "../../steps/models/Step";
+import {Board, Cell} from "../../context/models/board";
 
 export class NumbersAppearOnceInEachColumn {
     /*
@@ -8,14 +7,14 @@ export class NumbersAppearOnceInEachColumn {
     *
     * */
     index: number
-    board: BoardRepresentation
-    cell: CellRepresentation
+    board: Board
+    cell: Cell
     steps: Step[]
 
-    constructor(index: number, board: BoardRepresentation) {
+    constructor(index: number, board: Board) {
         this.index = index
         this.board = board
-        this.cell = board.getCell(index)
+        this.cell = board[index]
         this.steps = this.buildSteps()
     }
 

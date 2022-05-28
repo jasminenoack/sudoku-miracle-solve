@@ -1,23 +1,20 @@
-import {BoardRepresentation} from "../../board/models/BoardRepresentation";
 import {Step} from "../../steps/models/Step";
+import {AbstractProcedure} from "./ProcedureInterface";
+import {Board, CellHelpers} from "../../context/models/board";
 
-export class PencilMarksProcedure {
-    board: BoardRepresentation
-    index: number
-    steps: Step[]
-
-    constructor(board: BoardRepresentation, index: number) {
-        this.board = board
-        this.index = index
-        this.steps = this.buildSteps();
-    }
-
-    canRunProcedure() {
-        return true
-    }
+export class PencilMarksProcedure extends AbstractProcedure {
+    name: string = "Add pencil marks"
 
     addAllPencilMarksStep() {
-        this.board.getCell(this.index).addAllPencilMarks()
+        CellHelpers.addAllPencilMarksToCell(this.board[this.index])
+    }
+
+    static canRunProcedure(index: number | undefined = undefined, board: Board): boolean {
+        if (index === undefined) {
+            return false
+        }
+        const cell = board[index!];
+        return !cell.value;
     }
 
     buildSteps() {
@@ -29,20 +26,6 @@ export class PencilMarksProcedure {
                 this.addAllPencilMarksStep.bind(this)
             )
         ]
-    }
-
-    _getIncompleteSteps() {
-        return this.steps.filter(step => !step.isComplete)
-    }
-
-    isComplete() {
-        return !this._getIncompleteSteps().length
-    }
-
-    runNext() {
-        const incompleteSteps = this._getIncompleteSteps()
-        const firstStep = incompleteSteps[0]
-        firstStep.runStep()
     }
 }
 

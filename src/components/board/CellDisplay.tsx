@@ -1,32 +1,44 @@
-import {CellRepresentation, PencilMark} from "./models/CellRepresentation";
+import React, {useContext} from 'react'
 import './cell.css'
+import {Cell} from "../context/models/board";
+import {BoardContext} from "../context/BoardContext";
 
 interface PropTypes {
-    cell: CellRepresentation;
-    selected: boolean;
-    onClick: () => void;
+    cell: Cell;
+    index: number;
 }
 
-function PencilMarkDisplay({pencilMark}: {pencilMark: PencilMark}) {
+function PencilMarkDisplay(
+    {
+        pencilMarkValue,
+        pencilMarkStatus,
+    }: {
+        pencilMarkValue: string,
+        pencilMarkStatus: string,
+    }) {
     const classes = [
-        'pencil-mark', `pencil-${pencilMark.value}`
+        'pencil-mark', `pencil-${pencilMarkValue}`, pencilMarkStatus
     ]
-    if (pencilMark.invalid) {
-        classes.push('invalid')
-    }
     return (
-        <div key={pencilMark.value} className={classes.join(' ')}>{pencilMark.value}</div>
+        <div key={pencilMarkValue} className={classes.join(' ')}>{pencilMarkValue}</div>
     )
 }
 
-export function CellDisplay ({cell, selected, onClick}: PropTypes) {
-    const value = cell.getValue()
+export function CellDisplay ({cell, index}: PropTypes) {
+    const {selectedCell, setSelectedCell} = useContext(BoardContext);
+
+    const value = cell.value
     const classes: string[] = ['cell'];
     if (value) {
         classes.push('filled-cell')
     }
+    const selected = selectedCell === index
     if (selected) {
         classes.push('selected')
+    }
+
+    function onClick() {
+        setSelectedCell(selected ? undefined : index)
     }
 
     if (cell.value) {
@@ -34,7 +46,7 @@ export function CellDisplay ({cell, selected, onClick}: PropTypes) {
     } else {
         return (
             <button className={classes.join(' ')} data-testid={'cell'} onClick={onClick}>
-                {cell.pencilMarks.map(mark => <PencilMarkDisplay key={mark.value} pencilMark={mark}/>)}
+                {Object.keys(cell.pencilMarks).map(value => <PencilMarkDisplay key={value} pencilMarkValue={value} pencilMarkStatus={cell.pencilMarks[value]}/>)}
             </button>)
     }
 }

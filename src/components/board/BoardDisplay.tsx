@@ -1,24 +1,19 @@
-import {BoardRepresentation} from "./models/BoardRepresentation";
+import React, {useContext} from 'react'
 import {CellDisplay} from "./CellDisplay";
 import './board.css'
-import {useState} from "react";
+import {BoardContext} from "../context/BoardContext";
 
-interface PropTypes {
-    board: BoardRepresentation
-}
 
-export function BoardDisplay ({board}: PropTypes) {
-    const [selectedCell, setSelectedCell] = useState<undefined | number>(undefined)
+export function BoardDisplay () {
+    const {currentPuzzle} = useContext(BoardContext);
 
     return <div className={`board`}>{
-        board.cells.map((cell, index) => {
-            const selected = index === selectedCell
+        currentPuzzle.map((cell, index) => {
             return (
                 <CellDisplay
                     key={index}
                     cell={cell}
-                    selected={selected}
-                    onClick={() => setSelectedCell(selected ? undefined : index)}
+                    index={index}
                 />
             )
         })

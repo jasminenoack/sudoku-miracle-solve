@@ -23,6 +23,7 @@ export class Step {
     description: string
     updateforStep: (step: Step) => void
     isComplete: boolean = false
+    inProgress: boolean = false
 
     constructor(name: string, description: string, domClasses: DomClass[], updateforStep: (step: Step) => void) {
         this.name = name
@@ -47,6 +48,6 @@ export class Step {
 
     runStep() {
         this.updateforStep(this);
-        this.complete()
+        this.inProgress = true;
     }
 }
