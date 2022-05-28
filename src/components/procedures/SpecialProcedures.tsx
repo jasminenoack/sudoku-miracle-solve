@@ -31,11 +31,13 @@ function StartProceduresMenu () {
 
     const onlyOncePerDiagonal = ProcedureBuilderHelper.buildOnlyOncePerDiagonal(currentPuzzle, selectedCell!)
     const diagonalDelta4 = ProcedureBuilderHelper.buildPositiveDiagonalDeltaFour(currentPuzzle, selectedCell!)
+    const relationalDelta4 = ProcedureBuilderHelper.buildRelationalDeltaFour(currentPuzzle, selectedCell!)
     return (
         <div>
             <header>Start Special Procedure:</header>
             <SpecialProceduresItem procedure={onlyOncePerDiagonal}/>
             <SpecialProceduresItem procedure={diagonalDelta4}/>
+            <SpecialProceduresItem procedure={relationalDelta4}/>
         </div>
     );
 }

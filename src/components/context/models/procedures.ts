@@ -1,4 +1,5 @@
-import {Board, BoardHelpers, CellHelpers} from "./board";
+import {Board, BoardHelpers, CellHelpers, Cell} from "./board";
+import {CheckForDeltaAllowableValueGroupedNeighbors} from "./helpers/CheckForDeltaAllowableValues";
 
 export interface DomClass {
     className: string,
@@ -190,6 +191,19 @@ export class StepBuilderHelper {
     static processingClassName: string = 'processing-cell'
     static scanningClassName: string = 'scanning'
 
+    static defaultCompleteStep(step: Step, board: Board, index: number): {newBoard: Board, newStep: Step} {
+        const cell = board[index]
+        const newCell = CellHelpers.removeInvalidPencilMarksFromCell(cell)
+        const newBoard = BoardHelpers.replaceCells(
+            board,
+            [{index, newCell}]
+        )
+        return {
+            newBoard,
+            newStep: step,
+        }
+    }
+
     static buildAddAllValuesStep(index: number) {
         function buildProcessing(step: Step, board: Board): {newBoard: Board, newStep: Step} {
             const newStep = StepHelper.updateStep(
@@ -239,16 +253,7 @@ export class StepBuilderHelper {
         }
 
         function completeStep(step: Step, board: Board): {newBoard: Board, newStep: Step} {
-            const cell = board[index]
-            const newCell = CellHelpers.removeInvalidPencilMarksFromCell(cell)
-            const newBoard = BoardHelpers.replaceCells(
-                board,
-                [{index, newCell}]
-            )
-            return {
-                newBoard,
-                newStep: step,
-            }
+            return StepBuilderHelper.defaultCompleteStep(step, board, index)
         }
         return StepHelper.buildStep(
             `Values can only occur once per ${type}`,
@@ -332,16 +337,7 @@ export class StepBuilderHelper {
         }
 
         function completeStep(step: Step, board: Board): {newBoard: Board, newStep: Step} {
-            const cell = board[index]
-            const newCell = CellHelpers.removeInvalidPencilMarksFromCell(cell)
-            const newBoard = BoardHelpers.replaceCells(
-                board,
-                [{index, newCell}]
-            )
-            return {
-                newBoard,
-                newStep: step,
-            }
+            return StepBuilderHelper.defaultCompleteStep(step, board, index)
         }
         const indexes = BoardHelpers.getIndexesForAdjacentPositiveDiagonals(index)
         return StepHelper.buildStep(
@@ -360,6 +356,66 @@ export class StepBuilderHelper {
             completeStep,
         )
     }
+
+    static _updateBoardForUnallowedValues(board: Board, index: number, unAllowedValues: number[]) {
+        const cell = board[index]
+        const newCell = CellHelpers.makePencilMarksInvalid(unAllowedValues, cell)
+        return BoardHelpers.replaceCells(
+            board,
+            [{index, newCell}]
+        )
+    }
+
+    static buildStepsForCheckingValidCellDiagonalDeltaFour(index: number, board: Board): Step[] {
+        const indexes = BoardHelpers.getIndexesForAdjacentPositiveDiagonals(index)
+        function buildStep(index: number, value: number): Step {
+            function processingFunction(step: Step, board: Board): {newBoard: Board, newStep: Step} {
+                const checker = new CheckForDeltaAllowableValueGroupedNeighbors(
+                    value,
+                    cell,
+                    neighbors,
+                    4
+                )
+                const {valid, message} = checker.allOtherValuesCanExistTogether()
+                let unAllowedValues: number[] = [];
+                if (!valid) {
+                    unAllowedValues = [value]
+                }
+                const newBoard = StepBuilderHelper._updateBoardForUnallowedValues(board, index, unAllowedValues)
+                const newStep = StepHelper.updateStep(
+                    {descriptionOfChange: message},
+                    step,
+                )
+                return {
+                    newStep,
+                    newBoard,
+                }
+            }
+
+            function completeStep(step: Step, board: Board): {newBoard: Board, newStep: Step} {
+                return StepBuilderHelper.defaultCompleteStep(step, board, index)
+            }
+            return StepHelper.buildStep(
+                `Check if ${value} can be used without other cells breaking the delta 4 rule`,
+                [
+                    DomClassHelper.buildDomClass(
+                        StepBuilderHelper.processingClassName,
+                        [index],
+                    ),
+                    DomClassHelper.buildDomClass(
+                        StepBuilderHelper.scanningClassName,
+                        indexes,
+                    ),
+                ],
+                processingFunction,
+                completeStep,
+            )
+        }
+        const cell = board[index]
+        const cellValues = CellHelpers.getCurrentPencilMarks(cell)
+        const neighbors = indexes.map(index => board[index])
+        return cellValues.map(value => buildStep(index, value))
+    }
 }
 
 export class RuleBuilderHelper {
@@ -367,6 +423,13 @@ export class RuleBuilderHelper {
         return {
             name: name,
             steps: builders.map(builder => builder(index))
+        }
+    }
+
+    static _ruleBuilderFromSteps(index: number, name: string, steps: Step[]): Rule {
+        return {
+            name: name,
+            steps: steps
         }
     }
 
@@ -409,6 +472,14 @@ export class RuleBuilderHelper {
             ]
         )
     }
+
+    static buildRuleToCheckForDelta4Compliance(index: number, board: Board) {
+        return RuleBuilderHelper._ruleBuilderFromSteps(
+            index,
+            'A number must allow for each adjacent number on the positive diagonal to follow the 4 delta rule',
+            StepBuilderHelper.buildStepsForCheckingValidCellDiagonalDeltaFour(index, board)
+        )
+    }
 }
 
 export class ProcedureBuilderHelper {
@@ -419,7 +490,7 @@ export class ProcedureBuilderHelper {
         ruleBuilders: ((index: number) => Rule)[]
     ): Procedure  {
         let disabled = false;
-        if (index === undefined || board[index].value) {
+        if (index === undefined || board[index].value || CellHelpers.getCurrentPencilMarks(board[index]).length == 0) {
             disabled = true
         }
         if (disabled) {
@@ -463,6 +534,15 @@ export class ProcedureBuilderHelper {
             index,
             'Miracle positive diagonal delta 4',
             [RuleBuilderHelper.buildPositiveDiagonalDeltaFour]
+        )
+    }
+
+    static buildRelationalDeltaFour(board: Board, index: number): Procedure {
+        return ProcedureBuilderHelper._buildProcedureForEmptyMarkedCell(
+            board,
+            index,
+            'Group delta 4 conflict',
+            [() => RuleBuilderHelper.buildRuleToCheckForDelta4Compliance(index, board)]
         )
     }
 }

@@ -407,6 +407,47 @@ describe('buildOncePerDiagonalStep', () => {
     })
 });
 
+
+describe('buildStepsForCheckingValidCellDiagonalDeltaFour', () => {
+    it('should build steps for all values in cell', () => {
+        const board = getBoard()
+        const targetCell = board[4]
+        targetCell.pencilMarks = {
+            1: 'valid',
+            2: 'valid',
+            3: 'not_present',
+            4: 'not_present',
+            5: 'valid',
+            6: 'not_present',
+            7: 'not_present',
+            8: 'not_present',
+            9: 'valid',
+        }
+        const steps = StepBuilderHelper.buildStepsForCheckingValidCellDiagonalDeltaFour(4, board)
+        expect(steps.length).toEqual(4)
+    })
+
+    it('should allow you to run the process for the steps', () => {
+        const board = getBoard()
+        const targetCell = board[4]
+        targetCell.pencilMarks = {
+            1: 'valid',
+            2: 'valid',
+            3: 'not_present',
+            4: 'not_present',
+            5: 'valid',
+            6: 'not_present',
+            7: 'not_present',
+            8: 'not_present',
+            9: 'valid',
+        }
+        const steps = StepBuilderHelper.buildStepsForCheckingValidCellDiagonalDeltaFour(4, board)
+        expect(steps.length).toEqual(4)
+        const result1 = steps[0].updateForStep(steps[0], board)
+        expect(result1.newStep.descriptionOfChange).toEqual("Neighbor values could exist together: [6]")
+    })
+});
+
 //  0  1  2   3  4  5   6  7  8
 //  9 10 11  12 13 14  15 16 17
 // 18 19 20  21 22 23  24 25 26
