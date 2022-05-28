@@ -13,6 +13,8 @@ export const boardDataDefault = {
     runningSpecialProcedure: undefined,
     setRunningSpecialProcedure: (procedure: Procedure | undefined) => {},
     setCurrentPuzzle: (board: Board) => {},
+    setSelectedValues: (values: number[]) => {},
+    selectedValues: [],
 }
 
 interface BoardContext {
@@ -24,6 +26,8 @@ interface BoardContext {
     setRunningSpecialProcedure: (procedure: Procedure | undefined) => void;
     selectedCell: number | undefined;
     setSelectedCell: (index: number | undefined) => void;
+    setSelectedValues: (values: number[]) => void;
+    selectedValues: number[];
 }
 
 export const BoardContext = React.createContext<BoardContext>(boardDataDefault);
@@ -63,6 +67,7 @@ export function BoardContextProvider({children}: {children: ReactNode}) {
     const [runningProcedure, setRunningProcedure] = useState<undefined | Procedure>(undefined)
     const [runningSpecialProcedure, setRunningSpecialProcedure] = useState<undefined | Procedure>(undefined)
     const [selectedCell, setSelectedCell] = useState<undefined | number>(undefined)
+    const [selectedValues, setSelectedValues] = useState<number[]>([])
     const context = {
         currentPuzzle,
         setCurrentPuzzle,
@@ -72,6 +77,8 @@ export function BoardContextProvider({children}: {children: ReactNode}) {
         setSelectedCell,
         runningSpecialProcedure,
         setRunningSpecialProcedure,
+        selectedValues,
+        setSelectedValues,
     }
     return (
         <BoardContext.Provider value={context}>

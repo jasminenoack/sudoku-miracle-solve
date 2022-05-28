@@ -4,6 +4,7 @@ import {BoardDisplay} from './components/board/BoardDisplay'
 import {BoardContextProvider} from "./components/context/BoardContext";
 import {ProcedureDisplay} from "./components/procedures/Procedures";
 import {SpecialProcedureDisplay} from "./components/procedures/SpecialProcedures";
+import {NumberSelector} from "./components/helpers/FindNumberHelper";
 
 
 function App() {
@@ -16,6 +17,7 @@ function App() {
                 <BoardDisplay/>
                 <ProcedureDisplay/>
                 <SpecialProcedureDisplay/>
+                <NumberSelector/>
             </div>
         </BoardContextProvider>
     );

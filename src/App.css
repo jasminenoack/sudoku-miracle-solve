@@ -70,3 +70,40 @@ header {
     font-size: 2em;
 }
 
+.selected-1 {
+    background: aqua;
+    color: black;
+}
+.selected-2 {
+    background: magenta;
+    color: black;
+}
+.selected-3 {
+    background: orangered;
+    color: black;
+}
+.selected-4 {
+    background: lightsalmon;
+    color: black;
+}
+.selected-5 {
+    background: yellow;
+    color: black;
+}
+.selected-6 {
+    background: chartreuse;
+    color: black;
+}
+.selected-7 {
+    background: cornflowerblue;
+    color: black;
+}
+.selected-8 {
+    background: orchid;
+    color: black;
+}
+.selected-9 {
+    background: red;
+    color: black;
+}
+

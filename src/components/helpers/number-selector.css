@@ -1,0 +1,9 @@
+.number-selector {
+    margin: 10px;
+}
+
+.number-button {
+    height: 50px;
+    width: 50px;
+    font-size: 40px;
+}

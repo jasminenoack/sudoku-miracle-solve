@@ -17,26 +17,35 @@ function PencilMarkDisplay(
         pencilMarkValue: string,
         pencilMarkStatus: string,
     }) {
+    const {selectedValues} = useContext(BoardContext)
     const classes = [
-        'pencil-mark', `pencil-${pencilMarkValue}`, pencilMarkStatus,  `value-${pencilMarkValue}`
+        'pencil-mark', `pencil-${pencilMarkValue}`, pencilMarkStatus
     ]
+    if (selectedValues.indexOf(+pencilMarkValue) !== -1) {
+        classes.push(`selected-${pencilMarkValue}`)
+    }
     return (
         <div key={pencilMarkValue} className={classes.join(' ')}>{pencilMarkValue}</div>
     )
 }
 
 export function CellDisplay ({cell, index}: PropTypes) {
+    const {selectedValues} = useContext(BoardContext)
     const {selectedCell, setSelectedCell, runningProcedure} = useContext(BoardContext);
 
     const value = cell.value
-    let classes: string[] = ['cell', `value-${value}`];
+    let classes: string[] = ['cell'];
     if (value) {
         classes.push('filled-cell')
+        if (selectedValues.indexOf(+value) !== -1) {
+            classes.push(`selected-${value}`)
+        }
     }
     const selected = selectedCell === index
     if (selected) {
         classes.push('selected')
     }
+
     if (runningProcedure) {
         const currentStep = ProcedureHelper.getCurrentStep(runningProcedure)
         if (currentStep) {
