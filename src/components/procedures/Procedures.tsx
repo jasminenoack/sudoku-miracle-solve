@@ -33,6 +33,7 @@ export function StartProceduresMenu () {
     const fillInOnlyInColumn = ProcedureBuilderHelper.buildFillInOnlyInstanceInColumn(currentPuzzle, selectedCell!)
     const fillInOnlyInRow = ProcedureBuilderHelper.buildFillInOnlyInstanceInRow(currentPuzzle, selectedCell!)
     const fillInOnlyInSquare = ProcedureBuilderHelper.buildFillInOnlyInstanceInSquare(currentPuzzle, selectedCell!)
+    const fillInCellWithSingleValue = ProcedureBuilderHelper.buildFillInCellWithSingleValue(currentPuzzle, selectedCell!)
 
     return (
         <div>
@@ -41,6 +42,7 @@ export function StartProceduresMenu () {
             <ProceduresItem procedure={fillInOnlyInColumn}/>
             <ProceduresItem procedure={fillInOnlyInRow}/>
             <ProceduresItem procedure={fillInOnlyInSquare}/>
+            <ProceduresItem procedure={fillInCellWithSingleValue}/>
         </div>
     )
 }

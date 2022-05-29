@@ -50,6 +50,8 @@ function setUpBoard(): Board {
     const row8 = [63, 64, 65, 66, 67, 68, 69, 70, 71]
     const row9 = [72, 73, 74, 75, 76, 77, 78, 79, 80]
 
+    const rows = [row1, row2, row3, row4, row5, row6, row7, row8, row9]
+
     const column1 = [ 0,  9, 18, 27, 36, 45, 54, 63, 72]
     const column2 = [ 1, 10, 19, 28, 37, 46, 55, 64, 73]
     const column3 = [ 2, 11, 20, 29, 38, 47, 56, 65, 74]
@@ -59,6 +61,8 @@ function setUpBoard(): Board {
     const column7 = [ 6, 15, 24, 33, 42, 51, 60, 69, 78]
     const column8 = [ 7, 16, 25, 34, 43, 52, 61, 70, 79]
     const column9 = [ 8, 17, 26, 35, 44, 53, 62, 71, 80]
+
+    const columns = [column1, column2, column3, column4, column5, column6, column7, column8, column9]
 
     const square1 = [ 0,  1,  2,  9, 10, 11, 18, 19, 20]
     const square2 = [ 3,  4,  5, 12, 13, 14, 21, 22, 23]
@@ -70,6 +74,9 @@ function setUpBoard(): Board {
     const square8 = [57, 58, 59, 66, 67, 68, 75, 76, 77]
     const square9 = [60, 61, 62, 69, 70, 71, 78, 79, 80]
 
+    const squares = [square1, square2, square3, square4, square5, square6, square7, square8, square9]
+
+    const diagonal1 =  [ 0]
     const diagonal2 =  [ 1,  9]
     const diagonal3 =  [ 2, 10, 18]
     const diagonal4 =  [ 3, 11, 19, 27]
@@ -85,18 +92,27 @@ function setUpBoard(): Board {
     const diagonal14 = [                    53, 61, 69, 77]
     const diagonal15 = [                        62, 70, 78]
     const diagonal16 = [                            71, 79]
+    const diagonal17 = [                                80]
 
-    //  0  1  2   3  4  5   6  7  8
-    //  9 10 11  12 13 14  15 16 17
-    // 18 19 20  21 22 23  24 25 26
-    //
-    // 27 28 29  30 31 32  33 34 35
-    // 36 37 38  39 40 41  42 43 44
-    // 45 46 47  48 49 50  51 52 53
-    //
-    // 54 55 56  57 58 59  60 61 62
-    // 63 64 65  66 67 68  69 70 71
-    // 72 73 74  75 76 77  78 79 80
+    const diagonals = [
+         diagonal1,
+         diagonal2,
+         diagonal3,
+         diagonal4,
+         diagonal5,
+         diagonal6,
+         diagonal7,
+         diagonal8,
+         diagonal9,
+        diagonal10,
+        diagonal11,
+        diagonal12,
+        diagonal13,
+        diagonal14,
+        diagonal15,
+        diagonal16,
+        diagonal17,
+    ]
 
     const initialSquareIndexes = [54, 55, 56, 63, 64, 65, 72, 73, 74]
     const initialDiagonalWith1 = [72, 64, 56, 48, 40, 32, 24, 16, 8]
@@ -126,67 +142,98 @@ function setUpBoard(): Board {
     function fillInOnlyInSquare(index: number): Procedure[] {
         return [ProcedureBuilderHelper.buildFillInOnlyInstanceInSquare(board, index)]
     }
+    function fillInCellWithSingleValue(index: number): Procedure[] {
+        return [ProcedureBuilderHelper.buildFillInCellWithSingleValue(board, index)]
+    }
+    function checkOnlyForAllRelated(index: number): Procedure[] {
+        let column = columns.filter(things => things.indexOf(index) !== -1)[0]
+        let row = rows.filter(things => things.indexOf(index) !== -1)[0]
+        let square = squares.filter(things => things.indexOf(index) !== -1)[0]
+        let diagonal = diagonals.filter(things => things.indexOf(index) !== -1)[0]
+
+        if (index > 10) {
+            column = column.reverse()
+            row = row.reverse()
+            square = square.reverse()
+            diagonal = diagonal.reverse()
+        }
+
+        return [
+            // update related cells
+            ...checkOnlyOne(square),
+            ...checkOnlyOne(row),
+            ...checkOnlyOne(column),
+            ...checkOncePerDiagonal(diagonal),
+            // check the delta change by 4
+            ...checkDelta4Diagonal(diagonal),
+            ...checkDelta4Diagonal(square),
+            ...checkDelta4Diagonal(row),
+            ...checkDelta4Diagonal(column),
+            // check if the deltas work
+            ...checkRelatedDelta4(diagonal),
+            ...checkRelatedDelta4(square),
+            ...checkRelatedDelta4(row),
+            ...checkRelatedDelta4(column),
+        ]
+    }
+    function fillInCell(fillInFunction: (index: number) => Procedure[], index: number): Procedure[] {
+        return [
+            // fill in square
+            ...fillInFunction(index),
+            // update related cells
+            ...checkOnlyForAllRelated(index),
+        ]
+    }
 
     const procedures: Procedure[] = [
-        // remove repeat values for the square with the starting 1 & 2
-        ...checkOnlyOne(square7),
-        // remove repeat values for the column with the starting 1
-        ...checkOnlyOne(column1),
-        // remove repeat values for the column with the starting 2
-        ...checkOnlyOne(column3),
-        // remove repeat values for the row with the starting 1 & 2
-        ...checkOnlyOne(row9),
-        // remove repeat values for the diagonal with the starting 1
-        ...checkOncePerDiagonal(diagonal9),
-        // remove repeat values for the diagonal with the starting 2
-        ...checkOncePerDiagonal(diagonal11),
-        // remove the unavailable diagonal values for the row above the one with the starting 1 & 2
+        // check squares around 1
+        ...checkOnlyForAllRelated(72),
+        // check squares aroung 2
+        ...checkOnlyForAllRelated(74), 
+
+        // check the diagonals for the row above the bottom where we removed numbers
         ...checkDelta4Diagonal(row8),
-        // remove values from the diagonal with the starting 1
-        ...checkDelta4Diagonal(diagonal9.reverse()),
-        // remove values from the diagonal with the starting 2
-        ...checkDelta4Diagonal(diagonal11.reverse()),
-        // remove values that will not work for related cells in the bottom square (mostly 5s)
-        // basically a 5 has to be between a 1 & 9
-        ...checkRelatedDelta4(square7.reverse()),
-        // remove values in that will not work for the related cells in the diagonal with the starting 1
-        ...checkRelatedDelta4(diagonal9.reverse()),
-        // remove values in the middle left square that can't work with related diagonal swuares 
+
+        // update the values for the square above the square we keep changing 
         ...checkRelatedDelta4(square4.reverse()),
-        // remove the sixes from the row with the 2 in it
-        ...checkRelatedDelta4(diagonal11.reverse()),
-        // fill in a 6 in the top right corner
-        ...fillInOnlyInDiagonal(8),
-        // update related cells 
-        ...checkOnlyOne(square3),
-        ...checkOnlyOne(row1),
-        ...checkOnlyOne(column9),
-        // fill in a 6 in the top left corner of the bottom left square
-        ...fillInOnlyInSquare(54),
-        // update related cells
-        ...checkOnlyOne(square7),
-        ...checkOnlyOne(row7),
-        ...checkOnlyOne(column1),
-        ...checkOncePerDiagonal(diagonal7),
-        // fill in the 6 in the bottom middle box 
-        ...fillInOnlyInRow(66),
-        // update related cells
-        ...checkOnlyOne(square8),
-        ...checkOnlyOne(row8),
-        ...checkOnlyOne(column4),
-        ...checkOncePerDiagonal(diagonal11),
-        // update the diagonal for the delta rule 
-        ...checkDelta4Diagonal(diagonal11.reverse())
-        
 
+        // fill in a load of cells
+        ...fillInCell(fillInOnlyInDiagonal, 8),
+        ...fillInCell(fillInOnlyInSquare, 54),
+        ...fillInCell(fillInOnlyInRow, 66),
+        ...fillInCell(fillInCellWithSingleValue, 58),
+        ...fillInCell(fillInCellWithSingleValue, 16),
+        ...fillInCell(fillInCellWithSingleValue, 56),
+        ...fillInCell(fillInCellWithSingleValue, 64),
+        ...fillInCell(fillInCellWithSingleValue, 40),
+        ...fillInCell(fillInCellWithSingleValue, 32),
+        ...fillInCell(fillInCellWithSingleValue, 24),
+        ...fillInCell(fillInCellWithSingleValue, 48),
 
+        //  0  1  2   3  4  5   6  7  8
+        //  9 10 11  12 13 14  15 16 17
+        // 18 19 20  21 22 23  24 25 26
+        //
+        // 27 28 29  30 31 32  33 34 35
+        // 36 37 38  39 40 41  42 43 44
+        // 45 46 47  48 49 50  51 52 53
+        //
+        // 54 55 56  57 58 59  60 61 62
+        // 63 64 65  66 67 68  69 70 71
+        // 72 73 74  75 76 77  78 79 80
 
 
         // testing stuff 
+        
         // ...checkOnlyOne(allSquares),
         // ...checkOncePerDiagonal(allSquares),
         // ...checkDelta4Diagonal(allSquares),
         // ...checkRelatedDelta4(allSquares),
+
+        // ...checkOnlyOne(allSquares.reverse()),
+        // ...checkOncePerDiagonal(allSquares.reverse()),
+        // ...checkDelta4Diagonal(allSquares.reverse()),
+        // ...checkRelatedDelta4(allSquares.reverse()),
     ]
     const updates: {[key: string]: number[]} = {}
     let index = 0
@@ -219,12 +266,14 @@ function setUpBoard(): Board {
     return board
 }
 
+const defaultBoard = setUpBoard()
+
 // 42, 34
 
 export function BoardContextProvider({children}: {children: ReactNode}) {
     // const [currentPuzzle, setCurrentPuzzle] = useState<Board>(BoardHelpers.buildBoard(beginnerPuzzle1))
     // const [currentPuzzle, setCurrentPuzzle] = useState<Board>(BoardHelpers.buildBoard(miraclePuzzle1))
-    const [currentPuzzle, setCurrentPuzzle] = useState<Board>(setUpBoard())
+    const [currentPuzzle, setCurrentPuzzle] = useState<Board>(defaultBoard)
     const [runningProcedure, setRunningProcedure] = useState<undefined | Procedure>(undefined)
     const [runningSpecialProcedure, setRunningSpecialProcedure] = useState<undefined | Procedure>(undefined)
     const [selectedCell, setSelectedCell] = useState<undefined | number>(undefined)

@@ -481,6 +481,46 @@ export class StepBuilderHelper {
         const indexes = BoardHelpers.getIndexesForSquareContaining(index)
         return StepBuilderHelper._buildStepCellAsOnlyCellWithValue(index, indexes, 'diagonal')
     }
+
+    static buildFillInCellWithSingleValues(index: number): Step {
+        function processingFunction(step: Step, board: Board): {newBoard: Board, newStep: Step} {
+            const cell = board[index]
+            const values = CellHelpers.getCurrentPencilMarks(cell)
+
+            let message;
+            let newCell = cell
+            if (values.length == 1) {
+                message = `Sets single value to cell ${values[0]}`
+                newCell = CellHelpers.fillInCell(cell, values[0])
+            } else {
+                message = `Cell does not have a single values`
+            }
+
+            const newBoard = BoardHelpers.replaceCells(
+                board,
+                [{index, newCell}]
+            )
+            const newStep = StepHelper.updateStep(
+                {descriptionOfChange: message},
+                step,
+            )
+            return {
+                newStep,
+                newBoard,
+            }
+        }
+
+        return StepHelper.buildStep(
+            `Fill in cell with single value`,
+            [
+                DomClassHelper.buildDomClass(
+                    StepBuilderHelper.processingClassName,
+                    [index],
+                ),
+            ],
+            processingFunction,
+        )
+    }
 }
 
 export class RuleBuilderHelper {
@@ -575,6 +615,14 @@ export class RuleBuilderHelper {
             index,
             'Fill in only instance in square',
             [StepBuilderHelper.buildStepSetCellToOnlyValueInSquare]
+        )
+    }
+
+    static buildFillInCellWithSingleValue(index: number) {
+        return RuleBuilderHelper._ruleBuilder(
+            index,
+            'Fill in cell with single value',
+            [StepBuilderHelper.buildFillInCellWithSingleValues]
         )
     }
 }
@@ -676,6 +724,15 @@ export class ProcedureBuilderHelper {
             index,
             'Fill Only Instance in square',
             [RuleBuilderHelper.buildFillInOnlyInstanceInSquare]
+        )
+    }
+
+    static buildFillInCellWithSingleValue(board: Board, index: number): Procedure {
+        return ProcedureBuilderHelper._buildProcedureForEmptyMarkedCell(
+            board,
+            index,
+            'Fill in cell with single value',
+            [RuleBuilderHelper.buildFillInCellWithSingleValue]
         )
     }
 }
