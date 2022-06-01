@@ -13,7 +13,7 @@ function ProceduresItem (
 ) {
     const {selectedCell, currentPuzzle, setRunningProcedure} = useContext(BoardContext);
     const text = procedure.name
-    if (!selectedCell || currentPuzzle[selectedCell].value) {
+    if (selectedCell === undefined || currentPuzzle[selectedCell].value) {
         return <button disabled>{text}</button>
     }
 

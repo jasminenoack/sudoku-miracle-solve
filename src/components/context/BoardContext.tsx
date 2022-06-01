@@ -1,6 +1,6 @@
 import React, {ReactNode, useState} from 'react';
 import {beginnerPuzzle1} from "../../puzzle-data/beginner-puzzles";
-import {Board, BoardHelpers} from "./models/board";
+import {Board, BoardHelpers, CellHelpers} from "./models/board";
 import {Procedure, ProcedureBuilderHelper, ProcedureHelper} from "./models/procedures";
 import {miraclePuzzle1} from "../../puzzle-data/special-puzzles";
 
@@ -185,6 +185,81 @@ function setUpBoard(): Board {
         ]
     }
 
+    function removePencilMarks(indexes: number[], value: number) {
+        return [
+            ProcedureBuilderHelper.buildRemovePencilMark(board, indexes, value)
+        ]
+    }
+
+    function buildTestFillInFunction(index: number, value: number) {
+        return [
+            ProcedureBuilderHelper.buildTestFillInCellWithSingleValue(board, index, value),
+            ...checkOnlyForAllRelated(index)
+        ]
+    }
+
+    function internalUmm(index: number): Procedure[] {
+        let column = columns.filter(things => things.indexOf(index) !== -1)[0]
+        let row = rows.filter(things => things.indexOf(index) !== -1)[0]
+        let square = squares.filter(things => things.indexOf(index) !== -1)[0]
+        let diagonal = diagonals.filter(things => things.indexOf(index) !== -1)[0]
+        console.log(index)
+        console.log(square)
+        if (index > 10) {
+            column = column.reverse()
+            row = row.reverse()
+            square = square.reverse()
+            diagonal = diagonal.reverse()
+        }
+
+        return [
+            // update related cells
+            ...checkOnlyOne(square),
+            ...checkOnlyOne(row),
+            ...checkOnlyOne(column),
+            ...checkOncePerDiagonal(diagonal),
+            // // check the delta change by 4
+            ...checkDelta4Diagonal(diagonal),
+            // ...checkDelta4Diagonal(square),
+            // ...checkDelta4Diagonal(row),
+            // ...checkDelta4Diagonal(column),
+            // // check if the deltas work
+            // ...checkRelatedDelta4(diagonal),
+            // ...checkRelatedDelta4(square),
+            // ...checkRelatedDelta4(row),
+            // ...checkRelatedDelta4(column),
+        ]
+    }
+
+    function ummm(fillInFunction: (index: number) => Procedure[], index: number): Procedure[] {
+        return [
+            // fill in square
+            ...fillInFunction(index),
+            // update related cells
+            ...internalUmm(index),
+        ]
+    }
+
+    function checkAll(): Procedure[] {
+        return [
+            // update related cells
+            ...checkOnlyOne(allSquares),
+            ...checkOnlyOne(allSquares),
+            ...checkOnlyOne(allSquares),
+            ...checkOncePerDiagonal(allSquares),
+            // check the delta change by 4
+            ...checkDelta4Diagonal(allSquares),
+            ...checkDelta4Diagonal(allSquares),
+            ...checkDelta4Diagonal(allSquares),
+            ...checkDelta4Diagonal(allSquares),
+            // check if the deltas work
+            ...checkRelatedDelta4(allSquares),
+            ...checkRelatedDelta4(allSquares),
+            ...checkRelatedDelta4(allSquares),
+            ...checkRelatedDelta4(allSquares),
+        ]
+    }
+
     const procedures: Procedure[] = [
         // check squares around 1
         ...checkOnlyForAllRelated(72),
@@ -209,6 +284,101 @@ function setUpBoard(): Board {
         ...fillInCell(fillInCellWithSingleValue, 32),
         ...fillInCell(fillInCellWithSingleValue, 24),
         ...fillInCell(fillInCellWithSingleValue, 48),
+
+        // this doesn't work 
+        // if 46 => 2
+        // then 38 => 7
+        // then 65 => 8 
+        // then we have the only 3s in box seven as 36, 45, 47
+        // this means that 63 can't be a 3 because then there is no 3 in that box
+        // but it can only be a 3 so it must mean that 46 != 2
+        // ...buildTestFillInFunction(46, 2),
+        // // sets a 7
+        // ...fillInCell(fillInCellWithSingleValue, 38),
+        // ...checkAll(),
+        // // sets an 8
+        // ...fillInCell(fillInCellWithSingleValue, 65),
+        // ...checkAll(),
+        
+        // fill in with a 1 given all of that 
+        ...buildTestFillInFunction(46, 1),
+        ...checkRelatedDelta4(row5),
+        ...checkRelatedDelta4(row7),
+
+        ...removePencilMarks([31, 33], 6),
+        ...removePencilMarks([43, 44], 1),
+        ...removePencilMarks([78, 79, 80], 5),
+
+        ...checkAll(),
+        ...fillInCell(fillInOnlyInSquare, 43),
+        ...fillInCell(fillInOnlyInSquare, 49),
+        ...fillInCell(fillInOnlyInSquare, 78),
+        ...fillInCell(fillInOnlyInSquare, 23),
+        ...fillInCell(fillInCellWithSingleValue, 57),
+        ...fillInCell(fillInCellWithSingleValue, 31),
+        ...fillInCell(fillInCellWithSingleValue, 15),
+        ...fillInCell(fillInCellWithSingleValue, 30),
+        ...fillInCell(fillInCellWithSingleValue, 41),
+        ...fillInCell(fillInCellWithSingleValue, 39),
+        ...fillInCell(fillInCellWithSingleValue, 50),
+        ...fillInCell(fillInCellWithSingleValue, 55),
+        ...fillInCell(fillInCellWithSingleValue, 65),
+        ...fillInCell(fillInCellWithSingleValue, 73),
+        ...fillInCell(fillInCellWithSingleValue, 47),
+        ...fillInCell(fillInCellWithSingleValue, 63),
+        ...fillInCell(fillInCellWithSingleValue, 14),
+        ...fillInCell(fillInCellWithSingleValue, 42),
+        ...fillInCell(fillInCellWithSingleValue, 34),
+        ...fillInCell(fillInCellWithSingleValue, 35),
+        ...fillInCell(fillInCellWithSingleValue, 33),
+        ...fillInCell(fillInCellWithSingleValue, 51),
+        ...fillInCell(fillInCellWithSingleValue, 59),
+        ...fillInCell(fillInCellWithSingleValue, 67),
+        ...fillInCell(fillInCellWithSingleValue, 68),
+        ...fillInCell(fillInCellWithSingleValue, 70),
+        ...fillInCell(fillInCellWithSingleValue, 36),
+        ...fillInCell(fillInCellWithSingleValue, 38),
+        ...fillInCell(fillInCellWithSingleValue, 3),
+        ...fillInCell(fillInCellWithSingleValue, 25),
+        ...fillInCell(fillInCellWithSingleValue, 26),
+        ...fillInCell(fillInCellWithSingleValue, 75),
+        ...fillInCell(fillInCellWithSingleValue, 77),
+        ...fillInCell(fillInCellWithSingleValue, 76),
+        ...fillInCell(fillInCellWithSingleValue, 69),
+        ...fillInCell(fillInCellWithSingleValue, 71),
+        ...fillInCell(fillInCellWithSingleValue, 61),
+        ...fillInCell(fillInCellWithSingleValue, 62),
+        ...fillInCell(fillInCellWithSingleValue, 60),
+        ...fillInCell(fillInCellWithSingleValue, 79),
+        ...fillInCell(fillInCellWithSingleValue, 80),
+        ...fillInCell(fillInCellWithSingleValue, 44),
+        ...fillInCell(fillInCellWithSingleValue, 52),
+        ...fillInCell(fillInCellWithSingleValue, 53),
+        ...fillInCell(fillInCellWithSingleValue, 17),
+        ...fillInCell(fillInCellWithSingleValue, 7),
+        ...fillInCell(fillInCellWithSingleValue, 6),
+        ...fillInCell(fillInCellWithSingleValue, 5),
+        ...fillInCell(fillInCellWithSingleValue, 4),
+        ...fillInCell(fillInCellWithSingleValue, 13),
+        ...fillInCell(fillInCellWithSingleValue, 12),
+        ...fillInCell(fillInCellWithSingleValue, 22),
+        ...fillInCell(fillInCellWithSingleValue, 21),
+        ...fillInCell(fillInCellWithSingleValue, 20),
+        ...fillInCell(fillInCellWithSingleValue, 19),
+        ...fillInCell(fillInCellWithSingleValue, 11),
+        ...fillInCell(fillInCellWithSingleValue, 29),
+        ...fillInCell(fillInCellWithSingleValue, 37),
+        ...fillInCell(fillInCellWithSingleValue, 45),
+        ...fillInCell(fillInCellWithSingleValue, 27),
+        ...fillInCell(fillInCellWithSingleValue, 28),
+        ...fillInCell(fillInCellWithSingleValue, 18),
+        ...fillInCell(fillInCellWithSingleValue, 10),
+        ...fillInCell(fillInCellWithSingleValue, 9),
+        ...fillInCell(fillInCellWithSingleValue, 2),
+        ...fillInCell(fillInCellWithSingleValue, 1),
+        ...fillInCell(fillInCellWithSingleValue, 0),
+
+
 
         //  0  1  2   3  4  5   6  7  8
         //  9 10 11  12 13 14  15 16 17

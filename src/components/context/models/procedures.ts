@@ -521,6 +521,72 @@ export class StepBuilderHelper {
             processingFunction,
         )
     }
+
+    static buildTestInCellWithSingleValues(index: number, value: number): Step {
+        function processingFunction(step: Step, board: Board): {newBoard: Board, newStep: Step} {
+            const cell = board[index]
+            const newCell = CellHelpers.fillInCell(cell, value)
+
+            const newBoard = BoardHelpers.replaceCells(
+                board,
+                [{index, newCell}]
+            )
+            return {
+                newStep: step,
+                newBoard,
+            }
+        }
+
+        return StepHelper.buildStep(
+            `Fill in test cell`,
+            [
+                DomClassHelper.buildDomClass(
+                    StepBuilderHelper.processingClassName,
+                    [index],
+                ),
+            ],
+            processingFunction,
+        )
+    }
+
+    static buildRemovePencilMark(indexes: number[], value: number): Step {
+        function processingFunction(step: Step, board: Board): {newBoard: Board, newStep: Step} {
+            const cells = indexes.map(index => ({index, newCell: CellHelpers.makePencilMarksInvalid([value], board[index])}))
+
+            const newBoard = BoardHelpers.replaceCells(
+                board,
+                cells
+            )
+            return {
+                newStep: step,
+                newBoard,
+            }
+        }
+
+        function completeStep(step: Step, board: Board): {newBoard: Board, newStep: Step} {
+            const cells = indexes.map(index => ({index, newCell: CellHelpers.removeInvalidPencilMarksFromCell(board[index])}))
+            const newBoard = BoardHelpers.replaceCells(
+                board,
+                cells,
+            )
+            return {
+                newBoard,
+                newStep: step,
+            }
+        }
+
+        return StepHelper.buildStep(
+            `remove values from cell`,
+            [
+                DomClassHelper.buildDomClass(
+                    StepBuilderHelper.processingClassName,
+                    indexes,
+                ),
+            ],
+            processingFunction,
+            completeStep,
+        )
+    }
 }
 
 export class RuleBuilderHelper {
@@ -625,6 +691,23 @@ export class RuleBuilderHelper {
             [StepBuilderHelper.buildFillInCellWithSingleValues]
         )
     }
+
+    static buildTestFillInCellWithSingleValue(index: number, value: number) {
+        return RuleBuilderHelper._ruleBuilderFromSteps(
+            index,
+            'Fill in cell with single value',
+            [StepBuilderHelper.buildTestInCellWithSingleValues(index, value)]
+        )
+    }
+    
+    static buildRemovePencilMark(indexes: number[], value: number) {
+        return RuleBuilderHelper._ruleBuilderFromSteps(
+            // this doesn't matter
+            indexes[0],
+            'remove unallowed values',
+            [StepBuilderHelper.buildRemovePencilMark(indexes, value)]
+        )
+    }
 }
 
 export class ProcedureBuilderHelper {
@@ -632,9 +715,13 @@ export class ProcedureBuilderHelper {
         board: Board,
         index: number | undefined,
         text: string,
-        ruleBuilders: ((index: number) => Rule)[]
+        ruleBuilders: ((index: number) => Rule)[],
+        checkDisabled: (() => boolean) | undefined = undefined
     ): Procedure  {
         let disabled = false;
+        if (checkDisabled) {
+            disabled = checkDisabled()
+        }
         if (index === undefined || board[index].value || CellHelpers.getCurrentPencilMarks(board[index]).length == 0) {
             disabled = true
         }
@@ -710,11 +797,18 @@ export class ProcedureBuilderHelper {
     }
 
     static buildFillInOnlyInstanceInDiagonal(board: Board, index: number): Procedure {
+        function checkDisabled() {
+            if (index !== undefined && BoardHelpers.getIndexesForPositiveDiagonals(index).length !== 9) {
+                return true 
+            } 
+            return false
+        }
         return ProcedureBuilderHelper._buildProcedureForEmptyMarkedCell(
             board,
             index,
             'Fill Only Instance in diagonal',
-            [RuleBuilderHelper.buildFillInOnlyInstanceInDiagonal]
+            [RuleBuilderHelper.buildFillInOnlyInstanceInDiagonal],
+            checkDisabled,
         )
     }
 
@@ -733,6 +827,25 @@ export class ProcedureBuilderHelper {
             index,
             'Fill in cell with single value',
             [RuleBuilderHelper.buildFillInCellWithSingleValue]
+        )
+    }
+
+    static buildTestFillInCellWithSingleValue(board: Board, index: number, value: number): Procedure {
+        return ProcedureBuilderHelper._buildProcedureForEmptyMarkedCell(
+            board,
+            index,
+            'Fill in cell with single value',
+            [() => RuleBuilderHelper.buildTestFillInCellWithSingleValue(index, value)]
+        )
+    }
+
+    static buildRemovePencilMark(board: Board, indexes: number[], value: number) {
+        return ProcedureBuilderHelper._buildProcedureForEmptyMarkedCell(
+            board,
+            // this doesn't matter
+            indexes[0],
+            'remove unallowed values',
+            [() => RuleBuilderHelper.buildRemovePencilMark(indexes, value)]
         )
     }
 }
